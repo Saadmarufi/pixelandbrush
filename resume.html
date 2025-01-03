@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saad's Graphic Design Resume</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: "Arial", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #ffffff; /* White background */
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background Waving Effect */
+        .wave {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100%;
+            background: #2c3e50;
+            padding-top: 20px;
+            color: #ecf0f1;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .sidebar .contact-info {
+            padding: 20px;
+            text-align: center;
+            background-color: #34495e;
+        }
+
+        .sidebar .contact-info p {
+            margin: 5px 0;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #ecf0f1;
+            padding: 10px;
+            text-decoration: none;
+            margin: 15px 0;
+            border-radius: 5px;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: #34495e;
+            color: #f39c12;
+        }
+
+        .sidebar a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #f39c12;
+            transition: width 0.3s;
+        }
+
+        .sidebar a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content Area */
+        .content {
+            margin-left: 250px;
+            padding: 40px;
+            width: 100%;
+            background: #fff;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 36px;
+        }
+
+        h2 {
+            color: #858585;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+
+        .profile {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .profile img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .profile img:hover {
+            transform: scale(1.1);
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        /* Box Styling */
+        .box {
+            background-color: #052e49;
+            color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            height: 200px;
+        }
+
+        .box:hover {
+            transform: scale(1.05);
+            height: 300px;
+        }
+
+        .box h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .box .details {
+            font-size: 16px;
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .box:hover .details {
+            display: block;
+            opacity: 1;
+        }
+
+        .box:hover h3 {
+            font-size: 28px;
+        }
+
+        /* Contact Form Styling */
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .contact-form button {
+            background-color: #2980b9;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .contact-form button:hover {
+            background-color: #3498db;
+        }
+
+        /* Smooth Fade-In Transition */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile-Friendly Adjustments */
+        @media screen and (max-width: 900px) {
+            .sidebar {
+                width: 200px;
+                font-size: 16px;
+            }
+
+            .content {
+                margin-left: 200px;
+                padding: 20px;
+            }
+
+            .profile img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .box h3 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Waving Effect -->
+    <div class="wave"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Contact Info at the top -->
+        <div class="contact-info">
+            <h2>Saad Marufi</h2>
+            <p>Graphic Designer</p>
+            <p><strong>Phone:</strong> 437-808-7223</p>
+            <p><strong>Email:</strong> <a href="mailto:sm@pixelandbrush.com" style="color: #ecf0f1;">sm@pixelandbrush.com</a></p>
+            <p><strong>Address:</strong> 1460 Palmerston Drive, Ottawa, K1J 8P1</p>
+        </div>
+        
+        <!-- Sidebar Menu -->
+        <a href="javascript:void(0);" onclick="showSection('about')">About Me</a>
+        <a href="javascript:void(0);" onclick="showSection('skills')">Skills</a>
+        <a href="javascript:void(0);" onclick="showSection('experience')">Experience</a>
+        <a href="javascript:void(0);" onclick="showSection('contact')">Contact</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        
+        <!-- About Section -->
+        <div id="about" class="section fade-in">
+            <h1>Saad's Graphic Design Resume</h1>
+            <div class="profile">
+                <img src="profile.jpg" alt="Saad's Profile Picture">
+                <p>Creative & Passionate Graphic Designer with a flair for transforming ideas into stunning visual experiences.</p>
+            </div>
+            <p>I am a creative and passionate Graphic Designer with a strong focus on transforming ideas into
+
+        </div>
+
+        <!-- Skills Section -->
+        <div id="skills" class="section fade-in" style="display:none;">
+            <h2>Skills & Software</h2>
+            <div class="box">
+                <h3>Design Tools</h3>
+                <p>Adobe Photoshop, Adobe Illustrator, Adobe InDesign, Figma, Sketch, After Effects</p>
+                <div class="details">
+                    <p>Expert-level proficiency in design tools to create pixel-perfect graphics, illustrations, and animations.</p>
+                </div>
+            </div>
+            <div class="box">
+                <h3>3D Design</h3>
+                <p>Blender, Cinema 4D</p>
+                <div class="details">
+                    <p>Experience in creating 3D models, animations, and visual effects using advanced software.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience Section -->
+        <div id="experience" class="section fade-in" style="display:none;">
+            <h2>Experience</h2>
+            <div class="box">
+                <h3>Graphic Designer at Creative Studios (2018-2021)</h3>
+                <p>Worked on various branding, illustration, and digital design projects.</p>
+                <div class="details">
+                    <p>Led design projects and collaborated with clients to ensure high-quality results.</p>
+                </div>
+            </div>
+            <div class="box">
+                <h3>Senior Designer at Design Hub (2021-2024)</h3>
+                <p>Led design projects and managed a team of junior designers.</p>
+                <div class="details">
+                    <p>Mentored junior designers and ensured design consistency across all deliverables.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div id="contact" class="section fade-in" style="display:none;">
+            <h2>Contact Me</h2>
+            <form action="https://docs.google.com/forms/u/0/d/e/1FAIpQLScpTE1WLB93THCWAoIaU2n3GnIxCutGq13FRBZPfr8Km9DuAQ/formResponse" method="POST" class="contact-form">
+                <input type="text" name="entry.566998108" placeholder="Name" required>
+                <input type="email" name="entry.1878543247" placeholder="Email" required>
+                <textarea name="entry.1162970576" placeholder="Message" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
