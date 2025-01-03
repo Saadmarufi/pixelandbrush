@@ -227,6 +227,34 @@ html {
                 font-size: 20px;
             }
         }
+        .skill-box {
+    background-color: #052e49;
+    color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 200px;
+    text-align: center;
+    font-size: 18px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+/* Hover effect - Shake animation */
+.skill-box:hover {
+    animation: shakeUpDown 0.5s ease-in-out;
+}
+
+/* Shake up and down keyframes */
+@keyframes shakeUpDown {
+    0% { transform: translateY(0); }
+    25% { transform: translateY(-5px); }
+    50% { transform: translateY(5px); }
+    75% { transform: translateY(-5px); }
+    100% { transform: translateY(0); }
+}
+
     </style>
 </head>
 <body>
@@ -268,27 +296,33 @@ html {
         </div>
 
         <!-- Skills Section -->
-        <div id="skills" class="section fade-in" style="display:none;">
-            <h2>Skills</h2>
-            <ul>
-                <li>Detail-oriented</li>
-                <li>Self-Motivation</li>
-                <li>Decision-making</li>
-                <li>Critical Thinking</li>
-                <li>Marketing</li>
-                <li>Communication</li>
-                <li>Time Management</li>
-                <li>Problem Solving</li>
-                <li>Initiative</li>
-                <li>Microsoft Office Suite</li>
-                <li>Technology Savvy</li>
-                <li>Accountability</li>
-                <li>Public Relations</li>
-                <li>Graphic Design (Photoshop, Illustrator, InDesign, CorelDRAW)</li>
-                <li>Management</li>
-                <li>Customer Service Skills</li>
-            </ul>
-        </div>
+<div id="skills" class="section fade-in" style="display:none;">
+    <h2>Skills & Software</h2>
+    <div class="box">
+        <div class="skill-box">Detail-oriented</div>
+        <div class="skill-box">Self-Motivation</div>
+        <div class="skill-box">Decision-making</div>
+        <div class="skill-box">Critical Thinking</div>
+        <div class="skill-box">Marketing</div>
+        <div class="skill-box">Communication</div>
+        <div class="skill-box">Time Management</div>
+        <div class="skill-box">Problem Solving</div>
+        <div class="skill-box">Initiative</div>
+        <div class="skill-box">Ms. Office Suite</div>
+        <div class="skill-box">Technology savvy</div>
+        <div class="skill-box">Accountability</div>
+        <div class="skill-box">Public Relations</div>
+        <div class="skill-box">Troubleshooting</div>
+        <div class="skill-box">Graphic Designing</div>
+        <div class="skill-box">Photoshop</div>
+        <div class="skill-box">Illustrator</div>
+        <div class="skill-box">InDesign</div>
+        <div class="skill-box">CorelDRAW</div>
+        <div class="skill-box">Management</div>
+        <div class="skill-box">Customer Service</div>
+    </div>
+</div>
+
 
         <!-- Experience Section -->
         <div id="experience" class="section fade-in" style="display:none;">
