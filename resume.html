@@ -227,18 +227,26 @@ html {
                 font-size: 20px;
             }
         }
-        .skill-box {
+      .box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    gap: 10px; /* Spacing between skill boxes */
+    padding: 20px;
+}
+
+/* Skills Box Styling */
+.skill-box {
     background-color: #052e49;
     color: #fff;
     border-radius: 10px;
     padding: 20px;
-    margin-bottom: 20px;
-    display: inline-block;
     width: 200px;
     text-align: center;
     font-size: 18px;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 /* Hover effect - Shake animation */
@@ -254,6 +262,7 @@ html {
     75% { transform: translateY(-5px); }
     100% { transform: translateY(0); }
 }
+
 
     </style>
 </head>
@@ -322,8 +331,6 @@ html {
         <div class="skill-box">Customer Service</div>
         <div class="skill-box">Web designing</div>
         <div class="skill-box">Graphic designing</div>
-
-
     </div>
 </div>
 
