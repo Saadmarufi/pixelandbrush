@@ -1,330 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-CA">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creative Design Studio offering professional design services">
-    <title>Creative Design Studio</title>
-<link rel="icon" href="https://raw.githubusercontent.com/Saadmarufi/pixelandbrush/refs/heads/main/logo.png" type="image/png">
-    <style>
-        /* Reset and Base Styles */
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            background-color: #f4f4f4;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: #333;
-            padding: 1.5rem 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: rgb(246, 90, 38);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .logo:hover {
-            transform: scale3d(1.1,1.1,1);
-        }
-
-        .menu {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        .menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.1rem;
-            position: relative;
-            padding-bottom: 0.3rem;
-        }
-
-        .menu a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: #ff7f50;
-            transition: width 0.3s ease;
-        }
-
-        .menu a:hover::after {
-            width: 100%;
-        }
-
-        /* Slider Styles */
-        #slider {
-    margin-top: 100px;
-    height: 600px;
-    position: relative;
-    overflow: hidden;
-}
-
-#slider img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.slider-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    z-index: 10;
-}
-
-.slider-text h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.slider-text p {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.cta-button {
-    display: inline-block;
-    background-color: #ff7f50;
-    color: white;
-    padding: 1rem 2rem;
-    text-decoration: none;
-    font-size: 1.2rem;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-    background-color: #e06c3b;
-}
-
-
-        /* Services Section */
-        #services {
-            padding: 5rem 2rem;
-            background-color: #fff;
-            text-align: center;
-        }
-
-        .services-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 3rem auto;
-        }
-
-        .service-box {
-            perspective: 1000px;
-            height: 300px;
-        }
-
-        .service-front, .service-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            transition: transform 0.6s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            border-radius: 10px;
-        }
-
-        .service-front {
-            background-color: #333;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .service-back {
-            background-color: #ff7f50;
-            color: white;
-            transform: rotateY(180deg);
-        }
-
-        .service-box:hover .service-front {
-            transform: rotateY(180deg);
-        }
-
-        .service-box:hover .service-back {
-            transform: rotateY(0);
-        }
-
-        /* form container */
-        .form-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 2rem auto;
-    max-width: 800px;
-}
-
-iframe {
-    width: 100%;
-    max-width: 640px;
-    height: 800px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-        /* Footer Styles */
-        footer {
-            background-color: #222;
-            color: white;
-            padding: 3rem 0;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            padding: 0 2rem;
-        }
-
-        .address-bar {
-            font-size: 1.1rem;
-        }
-
-        .social-media {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: flex-end;
-        }
-
-        .social-media a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .social-media a:hover {
-            background-color: #ff7f50;
-        }
-
-        .canada-emblem {
-            height: 40px;
-            transition: transform 0.3s ease;
-        }
-
-        .canada-emblem:hover {
-            transform: scale3d(1.1,1.1,1);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .menu {
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .social-media {
-                justify-content: center;
-            }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pixel and Brush | Web Design, SEO &amp; AEO Agency in Ottawa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Pixel and Brush is a Ottawa digital studio for web design, Google SEO and AEO, social media content creation and logo branding. Call (613) 519-3706.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://pixelandbrush.com/">
+<meta name="theme-color" content="#07081a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pixel and Brush">
+<meta property="og:title" content="Pixel and Brush | Web Design, SEO &amp; AEO Agency in Ottawa">
+<meta property="og:description" content="Pixel and Brush is a Ottawa digital studio for web design, Google SEO and AEO, social media content creation and logo branding. Call (613) 519-3706.">
+<meta property="og:url" content="https://pixelandbrush.com/">
+<meta property="og:locale" content="en_CA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="geo.region" content="CA-ON">
+<meta name="geo.placename" content="Ottawa">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "ProfessionalService", "@id": "https://pixelandbrush.com/#business", "name": "Pixel and Brush", "url": "https://pixelandbrush.com/", "logo": "https://pixelandbrush.com/assets/logo.svg", "image": "https://pixelandbrush.com/assets/logo.svg", "description": "Pixel and Brush is a digital studio in Ottawa offering web design, Google SEO and AEO, social media content creation, and logo and branding.", "telephone": "+16135193706", "priceRange": "$$", "sameAs": ["https://www.instagram.com/pixel.andbrush"], "address": {"@type": "PostalAddress", "addressLocality": "Ottawa", "addressRegion": "ON", "addressCountry": "CA"}, "areaServed": [{"@type": "City", "name": "Ottawa"}, {"@type": "Country", "name": "Canada"}], "contactPoint": {"@type": "ContactPoint", "telephone": "+16135193706", "contactType": "sales", "availableLanguage": ["English"]}, "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Digital services", "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Web Design", "url": "https://pixelandbrush.com/web-design.html"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Google SEO & AEO", "url": "https://pixelandbrush.com/seo-aeo.html"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Social Media Content", "url": "https://pixelandbrush.com/social-media-content.html"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Logo & Branding", "url": "https://pixelandbrush.com/logo-branding.html"}}]}}, {"@type": "WebPage", "@id": "https://pixelandbrush.com/#page", "url": "https://pixelandbrush.com/", "name": "Pixel and Brush | Web Design, SEO & AEO Agency in Ottawa", "description": "Pixel and Brush is a Ottawa digital studio for web design, Google SEO and AEO, social media content creation and logo branding. Call (613) 519-3706.", "isPartOf": {"@type": "WebSite", "@id": "https://pixelandbrush.com/#site", "url": "https://pixelandbrush.com/", "name": "Pixel and Brush"}, "about": {"@id": "https://pixelandbrush.com/#business"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What services does Pixel and Brush offer?", "acceptedAnswer": {"@type": "Answer", "text": "We offer four services: custom web design, Google SEO and AEO (answer engine optimisation), social media content creation, and logo and branding. Most clients combine two or more so their brand looks and sounds the same everywhere."}}, {"@type": "Question", "name": "Do you work with businesses outside Ottawa?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. We are based in Ottawa, Ontario and work with clients across Canada and internationally. Everything runs smoothly over phone, WhatsApp and video calls."}}, {"@type": "Question", "name": "How long does a website take?", "acceptedAnswer": {"@type": "Answer", "text": "A landing page usually takes 1 to 2 weeks. A full multi-page business website takes 3 to 5 weeks, depending on content and features."}}, {"@type": "Question", "name": "What is the difference between SEO and AEO?", "acceptedAnswer": {"@type": "Answer", "text": "SEO helps your website rank in Google search results. AEO (answer engine optimisation) structures your content so AI tools like ChatGPT, Gemini, Perplexity and Google AI Overviews understand it and recommend your business in their answers. We do both together."}}, {"@type": "Question", "name": "How do I get a quote?", "acceptedAnswer": {"@type": "Answer", "text": "Call us at (613) 519-3706 or send a WhatsApp message with a short description of your project. We reply with questions, a plan and a clear quote."}}]}]}</script>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="/Users/saad/Desktop/New project/logo.png" alt="" style="height: 60px;">
-            </div>    
-        <nav>
-            <div class="logo">Pixel & Brush</div>
-            <ul class="menu">
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#gallery">Art Gallery</a></li>
-                <li><a href="resume.html#resume">About me </a></li>
-
-                
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        <section id="slider">
-            <img src="slide1.png" alt="pixelandbrush">
-            <div class="slider-text">
-                <h1>Welcome to Pixel & brush</h1>
-                <p>Crafting innovative and timeless designs</p>
-                <a href="#projects" class="cta-button">View Our Projects</a>
-            </div>
-        </section>
-
-        <section id="services">
-            <h2>Our Services</h2>
-            <div class="services-container">
-                <div class="service-box">
-                    <div class="service-front">Logo Design</div>
-                    <div class="service-back">We craft unique and memorable logos to represent your brand identity.</div>
-                </div>
-                <div class="service-box">
-                    <div class="service-front">Website Design</div>
-                    <div class="service-back">Our team designs responsive and visually appealing websites.</div>
-                </div>
-                <div class="service-box">
-                    <div class="service-front">Brochure Design</div>
-                    <div class="service-back">Eye-catching brochures that convey your message effectively.</div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <div class="address-bar">
-                Contact us:<br>
-                info@pixelandbrush.com<br>
-                437-808-7223<br>
-                www.pixelandbrush.com
-            </div>
-            <div>
-                © 2024 Design Studio. All rights reserved.
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Flag_of_Canada_%28leaf%29.svg" class="canada-emblem" alt="Canada Emblem">
-            </div>
-            <div class="social-media">
-                <a href="#" aria-label="Facebook">Facebook</a>
-                <a href="#" aria-label="Instagram">Instagram</a>
-                <a href="#" aria-label="LinkedIn">LinkedIn</a>
-            </div>
-        </div>
-    </footer>
+<div class="ambient" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="grain" aria-hidden="true"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></symbol></defs></svg>
+<header id="top"><div class="wrap"><nav class="nav glass" aria-label="Main">
+<a class="brand" href="index.html" aria-label="Pixel and Brush home"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/><rect x="9" y="12" width="7" height="7" rx="1.8" fill="#2f6bff"/><rect x="18" y="12" width="7" height="7" rx="1.8" fill="#3d63f5"/><rect x="9" y="21" width="7" height="7" rx="1.8" fill="#4a5bef"/><rect x="18" y="21" width="7" height="7" rx="1.8" fill="#2f6bff" opacity=".35"/><path d="M37.5 10.5c1.2 1 1 2.6-.2 3.8L27 26.5l-3-2.6 11.3-12.9c.6-.7 1.5-1 2.2-.5Z" fill="#7b3fe4"/><path d="M23.2 24.6l3 2.7c-.6 3.4-3 6.6-7.6 7.7-1.6.4-3.3.3-4.6-.3 2.6-1 3.6-2.6 4.6-4.9 1-2.4 2.5-4.4 4.6-5.2Z" fill="#e0338f"/></svg><span>PIXEL <span class="grad-text">&amp;</span> BRUSH<small>DIGITAL STUDIO</small></span></a>
+<div class="links" id="links">
+<a href="index.html" aria-current="page">Home</a>
+<div class="dd"><button type="button" aria-expanded="false" aria-haspopup="true">Services <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="dd-menu"><a href="web-design.html"><span><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8M12 18v3"/></svg></span><div>Web Design<small>Fast, custom websites that convert</small></div></a><a href="seo-aeo.html"><span><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M8 11h6M11 8v6"/></svg></span><div>Google SEO & AEO<small>Rank on Google, get cited by AI</small></div></a><a href="social-media-content.html"><span><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="#fff"/></svg></span><div>Social Media Content<small>Reels, posts & monthly calendars</small></div></a><a href="logo-branding.html"><span><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9 12.5c-2.5 0-4 1.8-4 4 0 1.6-.8 2.6-2 3 4.5 1.5 9-.5 9-4.5z"/></svg></span><div>Logo & Branding<small>Logos and brand identity systems</small></div></a></div></div>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</div>
+<div class="nav-actions">
+<a class="btn btn-call" href="tel:+16135193706" aria-label="Call now (613) 519-3706"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span class="num">(613) 519-3706</span></a>
+<a class="btn btn-grad" href="https://wa.me/16135193706" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#wa"/></svg><span>WhatsApp</span></a>
+<button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="links"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+</div></nav></div></header>
+<main>
+<div class="wrap"><div class="hero">
+<div><span class="eyebrow load">Web Design · SEO · AEO · Social · Branding</span>
+<h1 class="load d1">Ottawa web design &amp; SEO that <span class="grad-text">gets you found.</span></h1>
+<p class="lead load d2">Pixel and Brush builds fast, beautiful websites, ranks them on Google, gets them quoted by AI answer engines, and keeps your social feeds full of content people stop to read.</p>
+<div class="load d3"><div class="ctas"><a class="btn btn-grad" href="tel:+16135193706"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>Call now (613) 519-3706</a>
+<a class="btn btn-ghost" href="https://wa.me/16135193706" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#wa"/></svg>Get a free quote on WhatsApp</a></div></div>
+<div class="tags load d4"><a class="tag" href="web-design.html">Web Design</a><a class="tag" href="seo-aeo.html">Google SEO</a><a class="tag" href="seo-aeo.html">AEO</a><a class="tag" href="social-media-content.html">Social Content</a><a class="tag" href="logo-branding.html">Logo &amp; Branding</a></div></div>
+<div class="stage load d3" aria-hidden="true">
+<div class="mock glass"><div class="bar"><i></i><i></i><i></i></div><div class="hero-block"></div><div class="rows"><span></span><span></span><span></span></div><div class="lines"><b></b><b></b><b></b></div></div>
+<div class="chip glass c1"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg></div><div><strong>Page one on Google</strong><span class="serp">"web design ottawa"</span></div></div>
+<div class="chip glass c2"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z"/></svg></div><div><strong>Cited by AI answers</strong><span>ChatGPT · Gemini · Perplexity</span></div></div>
+<div class="chip glass c3"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg></div><div><strong>Reels &amp; carousels</strong><span>Planned weekly</span></div></div>
+</div></div></div>
+<div class="marquee" aria-hidden="true"><div class="track"><span>Landing pages</span><span>E-commerce</span><span>Local SEO</span><span>Schema markup</span><span>Instagram reels</span><span>Brand guidelines</span><span>Logo systems</span><span>Google Business Profile</span><span>Landing pages</span><span>E-commerce</span><span>Local SEO</span><span>Schema markup</span><span>Instagram reels</span><span>Brand guidelines</span><span>Logo systems</span><span>Google Business Profile</span></div></div>
+<section id="services"><div class="wrap"><div class="sec-head reveal"><div><span class="eyebrow">What we do</span><h2>Four services, one consistent brand.</h2></div><p>Every pixel we design and every word we publish works toward the same goal: more of the right people finding you and reaching out.</p></div><div class="services"><article class="card glass reveal"><span class="kicker">WEB</span><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8M12 18v3"/></svg></div>
+<h3><a href="web-design.html">Web Design</a></h3><p>Custom, mobile-first websites with smooth motion and clean code. Built to load fast, convert visitors, and be easy for you to update.</p><ul><li>UI/UX design</li><li>Responsive build</li><li>E-commerce</li><li>Speed optimisation</li></ul>
+<span class="more">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></article><article class="card glass reveal"><span class="kicker">SEARCH</span><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M8 11h6M11 8v6"/></svg></div>
+<h3><a href="seo-aeo.html">Google SEO & AEO</a></h3><p>Rank higher on Google and become the source AI assistants quote. Keyword strategy, technical fixes, schema and answer-ready content.</p><ul><li>Keyword research</li><li>Technical SEO</li><li>Schema & FAQs</li><li>Local SEO</li></ul>
+<span class="more">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></article><article class="card glass reveal"><span class="kicker">SOCIAL</span><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="#fff"/></svg></div>
+<h3><a href="social-media-content.html">Social Media Content</a></h3><p>Scroll-stopping posts, reels and carousels in your brand style, with captions and a content calendar that keeps you posting consistently.</p><ul><li>Reels & shorts</li><li>Carousels</li><li>Captions & hashtags</li><li>Monthly calendar</li></ul>
+<span class="more">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></article><article class="card glass reveal"><span class="kicker">BRAND</span><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9 12.5c-2.5 0-4 1.8-4 4 0 1.6-.8 2.6-2 3 4.5 1.5 9-.5 9-4.5z"/></svg></div>
+<h3><a href="logo-branding.html">Logo & Branding</a></h3><p>A logo with meaning, plus the colour palette, typography and guidelines that make your brand instantly recognisable.</p><ul><li>Logo design</li><li>Colour & type</li><li>Brand guidelines</li><li>Social kits</li></ul>
+<span class="more">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></article></div></div></section>
+<section id="aeo"><div class="wrap"><div class="sec-head reveal"><div><span class="eyebrow">Search in 2026</span><h2>Ranked on Google. Quoted by AI.</h2></div><p>People now search in two places: the results page and the AI chat box. We optimise your site for both, so you show up wherever your customers ask.</p></div><div class="split">
+<div class="answer glass reveal"><h3><em>SEO</em> Search Engine Optimisation</h3><p>Win the click on Google with fast pages, the right keywords, strong backlinks and a complete Google Business Profile.</p>
+<div class="query"><div class="q">best bakery in ottawa</div><div class="res"><small>yourbrand.com › menu</small><a href="seo-aeo.html">Your Bakery · Fresh Sourdough Baked Daily</a><p style="margin-top:4px;color:var(--muted);font-size:.82rem">★★★★★ Open now · Order online for same-day pickup</p></div></div></div>
+<div class="answer glass reveal"><h3><em>AEO</em> Answer Engine Optimisation</h3><p>Get recommended inside ChatGPT, Gemini, Perplexity and Google AI Overviews with structured data and clear, citable answers.</p>
+<div class="query"><div class="q">Which bakery should I try in Ottawa?</div><div class="ai-line"><span class="ai-dot"></span><div><span id="typed" class="typing" data-text="Locals recommend Your Bakery for its fresh sourdough, baked daily and available for same-day pickup."></span><br><span class="cite">Source: yourbrand.com</span></div></div></div></div>
+</div></div></section>
+<section id="process"><div class="wrap"><div class="sec-head reveal"><div><span class="eyebrow">How we work</span><h2>From first call to launch.</h2></div><p>A clear four-stage process, with updates on WhatsApp at every step so you always know what's happening.</p></div><div class="steps"><div class="step glass reveal"><div class="n">01</div><h3>Discover</h3><p>We learn your business, audience and competitors, then agree on goals and scope.</p><div class="bar"><i style="--w:25%"></i></div></div><div class="step glass reveal"><div class="n">02</div><h3>Design</h3><p>Brand, layouts and content drafts, refined with your feedback until they feel right.</p><div class="bar"><i style="--w:50%"></i></div></div><div class="step glass reveal"><div class="n">03</div><h3>Build &amp; launch</h3><p>Development, SEO setup, schema and testing on every device before going live.</p><div class="bar"><i style="--w:75%"></i></div></div><div class="step glass reveal"><div class="n">04</div><h3>Grow</h3><p>Ongoing content, ranking reports and improvements that compound month after month.</p><div class="bar"><i style="--w:100%"></i></div></div></div></div></section>
+<section id="faq"><div class="wrap"><div class="sec-head reveal"><div><span class="eyebrow">Questions</span><h2>Good to know.</h2></div></div><div class="faq"><details class="glass reveal"><summary>What services does Pixel and Brush offer?</summary><p>We offer four services: custom web design, Google SEO and AEO (answer engine optimisation), social media content creation, and logo and branding. Most clients combine two or more so their brand looks and sounds the same everywhere.</p></details><details class="glass reveal"><summary>Do you work with businesses outside Ottawa?</summary><p>Yes. We are based in Ottawa, Ontario and work with clients across Canada and internationally. Everything runs smoothly over phone, WhatsApp and video calls.</p></details><details class="glass reveal"><summary>How long does a website take?</summary><p>A landing page usually takes 1 to 2 weeks. A full multi-page business website takes 3 to 5 weeks, depending on content and features.</p></details><details class="glass reveal"><summary>What is the difference between SEO and AEO?</summary><p>SEO helps your website rank in Google search results. AEO (answer engine optimisation) structures your content so AI tools like ChatGPT, Gemini, Perplexity and Google AI Overviews understand it and recommend your business in their answers. We do both together.</p></details><details class="glass reveal"><summary>How do I get a quote?</summary><p>Call us at (613) 519-3706 or send a WhatsApp message with a short description of your project. We reply with questions, a plan and a clear quote.</p></details></div></div></section>
+<section id="quote"><div class="wrap"><div class="contact glass reveal">
+<div><span class="eyebrow">Contact us</span><h2>Let's build something <span class="grad-text">you're proud of.</span></h2>
+<p class="sub">Call now or send a WhatsApp message. We usually reply within a few hours.</p>
+<div class="contact-ways">
+<div class="way call"><div class="ic" style="color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></div><div class="who"><span>Call now</span><strong>(613) 519-3706</strong></div><a class="copy" href="tel:+16135193706">Call</a></div>
+<div class="way wa-way"><div class="ic"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><use href="#wa"/></svg></div><div class="who"><span>WhatsApp</span><strong>@saadmarufi</strong></div><a class="copy" href="https://wa.me/16135193706" target="_blank" rel="noopener">Chat</a></div>
+<div class="way ig-way"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".9" fill="currentColor" stroke="none"/></svg></div><div class="who"><span>Instagram · see our work</span><strong>@pixel.andbrush</strong></div><a class="copy" href="https://www.instagram.com/pixel.andbrush" target="_blank" rel="noopener me">Follow</a></div>
+</div></div>
+<form id="waForm" novalidate>
+<label for="name">Your name<input id="name" name="name" autocomplete="name" placeholder="e.g. Sara Ahmed" required></label>
+<label for="biz">Business / brand<input id="biz" name="biz" autocomplete="organization" placeholder="e.g. Sunrise Bakery"></label>
+<fieldset style="border:0;padding:0;margin:0;display:grid;gap:8px"><legend style="font-size:.82rem;color:var(--muted);margin-bottom:8px">I'm interested in</legend>
+<div class="svc-pick">
+<label><input type="checkbox" id="s1" value="Web Design" checked><span>Web Design</span></label>
+<label><input type="checkbox" id="s2" value="Google SEO & AEO"><span>SEO &amp; AEO</span></label>
+<label><input type="checkbox" id="s3" value="Social Media Content"><span>Social Content</span></label>
+<label><input type="checkbox" id="s4" value="Logo & Branding"><span>Logo &amp; Branding</span></label>
+</div></fieldset>
+<label for="msg">Project details<textarea id="msg" name="msg" placeholder="What are you looking for? Any deadline or budget in mind?"></textarea></label>
+<button class="btn btn-wa" type="submit"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#wa"/></svg>Send on WhatsApp</button>
+<p class="note" id="note" role="status"></p>
+</form></div></div></section>
+</main>
+<footer><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="index.html"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/><rect x="9" y="12" width="7" height="7" rx="1.8" fill="#2f6bff"/><rect x="18" y="12" width="7" height="7" rx="1.8" fill="#3d63f5"/><rect x="9" y="21" width="7" height="7" rx="1.8" fill="#4a5bef"/><rect x="18" y="21" width="7" height="7" rx="1.8" fill="#2f6bff" opacity=".35"/><path d="M37.5 10.5c1.2 1 1 2.6-.2 3.8L27 26.5l-3-2.6 11.3-12.9c.6-.7 1.5-1 2.2-.5Z" fill="#7b3fe4"/><path d="M23.2 24.6l3 2.7c-.6 3.4-3 6.6-7.6 7.7-1.6.4-3.3.3-4.6-.3 2.6-1 3.6-2.6 4.6-4.9 1-2.4 2.5-4.4 4.6-5.2Z" fill="#e0338f"/></svg><span>PIXEL <span class="grad-text">&amp;</span> BRUSH</span></a>
+<p>Web design, Google SEO &amp; AEO, social media content and logo branding for businesses in Ottawa and across Canada.</p><div class="socials"><a href="https://www.instagram.com/pixel.andbrush" target="_blank" rel="noopener me" aria-label="Pixel and Brush on Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".9" fill="currentColor" stroke="none"/></svg></a><a href="https://wa.me/16135193706" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#wa"/></svg></a><a href="tel:+16135193706" aria-label="Call (613) 519-3706"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></a></div></div>
+<div><h4>Services</h4><ul><li><a href="web-design.html">Web Design</a></li><li><a href="seo-aeo.html">Google SEO & AEO</a></li><li><a href="social-media-content.html">Social Media Content</a></li><li><a href="logo-branding.html">Logo & Branding</a></li></ul></div>
+<div><h4>Studio</h4><ul><li><a href="about.html">About us</a></li><li><a href="contact.html">Contact</a></li><li><a href="contact.html#quote">Get a quote</a></li></ul></div>
+<div><h4>Talk to us</h4><ul><li><a href="tel:+16135193706">Call (613) 519-3706</a></li><li><a href="https://wa.me/16135193706" target="_blank" rel="noopener">WhatsApp (613) 519-3706</a></li><li>WhatsApp @saadmarufi</li><li><a href="https://www.instagram.com/pixel.andbrush" target="_blank" rel="noopener me">Instagram @pixel.andbrush</a></li><li>Ottawa, Ontario, Canada</li></ul></div>
+</div>
+<div class="foot"><span>© <span id="yr">2026</span> Pixel and Brush. All rights reserved.</span><span>Web Design · SEO · AEO · Social Media · Branding</span></div>
+</div></footer>
+<a class="fab-call" href="tel:+16135193706" aria-label="Call now (613) 519-3706"><span style="color:#fff;display:grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span></a>
+<a class="fab" href="https://wa.me/16135193706" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><use href="#wa"/></svg></a>
+<script src="assets/main.js"></script>
 </body>
 </html>
