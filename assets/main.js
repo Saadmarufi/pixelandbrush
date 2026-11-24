@@ -2,7 +2,7 @@
 const PHONE = "+16135193706";               // Call now
 const PHONE_DISPLAY = "(613) 519-3706";
 const WHATSAPP_NUMBER = "16135193706";       // digits only, with country code
-const HANDLE = "@saadmarufi";
+const HANDLE = "@pixelandbrush1";
 const waURL = t => "https://wa.me/" + WHATSAPP_NUMBER + (t ? "?text=" + encodeURIComponent(t) : "");
 const $ = s => document.querySelector(s);
 
@@ -76,5 +76,5 @@ if (form) form.addEventListener("submit", e => {
   const msg = ($("#msg") || {}).value?.trim() || "";
   const text = `Hi Pixel and Brush! I'm ${name}${biz ? " from " + biz : ""}.\nInterested in: ${svcs.join(", ") || "not sure yet"}.${msg ? "\n\n" + msg : ""}`;
   const a = document.createElement("a"); a.href = waURL(text); a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
-  note.textContent = `WhatsApp should open with your message ready. If it doesn't, call or WhatsApp us at ${PHONE_DISPLAY}.`;
+  note.textContent = `WhatsApp should open with your message ready. If it doesn't, WhatsApp us at ${HANDLE} or call ${PHONE_DISPLAY}.`;
 });
