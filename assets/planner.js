@@ -255,7 +255,7 @@ async function snapshot(){
     return await new Promise(r => canvas.toBlob(r, "image/jpeg", 0.85));
   }catch(e){ return null; }
 }
-async function emailPlan(d, image){
+async function emailPlan(d, image, waitMs){
   const fd = new FormData();
   fd.append("_subject", `New website plan: ${d.name}`);
   fd.append("_cc", CC);
@@ -267,9 +267,12 @@ async function emailPlan(d, image){
   for(const [k,v] of rows(d)) fd.append(k, v);
   fd.append("See their design", designLink());
   if(image) fd.append("attachment", image, "website-plan-" + d.name.toLowerCase().replace(/[^a-z0-9]+/g,"-") + ".jpg");
-  const res = await fetch(FORM_URL, {method:"POST", body:fd, headers:{Accept:"application/json"}});
-  const j = await res.json().catch(() => ({}));
-  return res.ok && String(j.success) === "true";
+  const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), waitMs);
+  try{
+    const res = await fetch(FORM_URL, {method:"POST", body:fd, headers:{Accept:"application/json"}, signal:ctl.signal});
+    const j = await res.json().catch(() => ({}));
+    return res.ok && String(j.success) === "true";
+  } finally { clearTimeout(timer); }
 }
 $("#sendPlan").addEventListener("click", async () => {
   const d = ready(); if(!d) return;
@@ -278,8 +281,8 @@ $("#sendPlan").addEventListener("click", async () => {
   let ok = false;
   try{
     const image = await snapshot();
-    ok = await emailPlan(d, image).catch(() => false);
-    if(!ok && image) ok = await emailPlan(d, null).catch(() => false); // try again without the picture
+    ok = await emailPlan(d, image, image ? 15000 : 20000).catch(() => false);
+    if(!ok && image) ok = await emailPlan(d, null, 20000).catch(() => false); // try again without the picture
   }catch(e){ ok = false; }
   btn.disabled = false; btn.innerHTML = label;
   $("#waLink").href = `https://wa.me/${WA_ID}?text=${encodeURIComponent(message(d, true))}`;
