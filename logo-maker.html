@@ -127,6 +127,8 @@ button,input,select{font:inherit;color:inherit}
 
   <div class="work">
     <nav class="rail" aria-label="Drawing tools">
+      <button class="tool" data-tool="select" aria-pressed="false" title="Select & move (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h2M11 4h2M17 4h2a1 1 0 0 1 1 1v2M20 11v2M4 11v2M4 17v2a1 1 0 0 0 1 1h2"/><path d="m12 12 8 3-3.5 1.5L15 20z"/></svg>Select</button>
+      <hr>
       <button class="tool" data-tool="brush" aria-pressed="true" title="Brush (B)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9 12.5c-2.5 0-4 1.8-4 4 0 1.6-.8 2.6-2 3 4.5 1.5 9-.5 9-4.5z"/></svg>Brush</button>
       <button class="tool" data-tool="line" aria-pressed="false" title="Line (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20 20 4"/></svg>Line</button>
       <button class="tool" data-tool="eraser" aria-pressed="false" title="Eraser (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4L13.3 4.7a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21z"/><path d="M22 21H7M5.5 12.5l6 6"/></svg>Eraser</button>
@@ -137,6 +139,9 @@ button,input,select{font:inherit;color:inherit}
       <hr>
       <button class="tool" data-tool="text" aria-pressed="false" title="Text (X)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>Text</button>
       <button class="tool" data-tool="fill" aria-pressed="false" title="Paint bucket (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M5 2l5 5M2 13h15M22 20a2 2 0 1 1-4 0c0-1.6 2-4 2-4s2 2.4 2 4z"/></svg>Fill</button>
+      <hr>
+      <button class="tool" id="imgBtn" title="Upload an image (I)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>Image</button>
+      <input type="file" id="imgInput" accept="image/*" hidden>
     </nav>
 
     <main class="stage">
@@ -144,11 +149,26 @@ button,input,select{font:inherit;color:inherit}
         <canvas id="art" width="1000" height="1000" aria-label="Your logo drawing"></canvas>
         <canvas id="guide" width="1000" height="1000" aria-hidden="true"></canvas>
         <canvas id="live" width="1000" height="1000" aria-hidden="true"></canvas>
-        <div class="hint" id="hint"><b>Sketch your logo here</b>Pick a tool and start drawing.<br>On a computer, hold Shift for perfect circles and squares.</div>
+        <div class="hint" id="hint"><b>Sketch your logo here</b>Pick a tool and start drawing, or upload an image.<br>On a computer, hold Shift for perfect circles and squares.</div>
       </div>
     </main>
 
     <aside class="side">
+      <div class="sec" id="selPanel" hidden>
+        <h3>Selection</h3>
+        <span class="label">Drag to move. Drag a corner to resize (hold Shift to stretch freely). Arrow keys nudge it.</span>
+        <div class="acts">
+          <button class="btn" id="selDup">Duplicate</button>
+          <button class="btn" id="selFlip">Flip</button>
+          <button class="btn" id="selDel">Delete</button>
+          <button class="btn primary" id="selDone">Done</button>
+        </div>
+      </div>
+      <div class="sec" id="selHelp" hidden>
+        <h3>Select</h3>
+        <span class="label">Drag a box around any part of your drawing to move, resize, copy or delete it.</span>
+        <button class="btn" id="selAll">Select everything</button>
+      </div>
       <div class="sec">
         <h3>Colour</h3>
         <div class="current">
@@ -232,6 +252,7 @@ const art = $("#art"), live = $("#live"), guide = $("#guide"), board = $("#board
 const ctx = art.getContext("2d"), lctx = live.getContext("2d");
 const W = art.width, H = art.height;
 
+let F = null; // floating selection or uploaded image: {c, x, y, w, h}
 const S = { tool:"brush", color:"#7b3fe4", alpha:1, size:14, fill:"filled", bg:"transparent", bgColor:"#0d0f2a", undo:[], redo:[], recent:[] };
 const PALETTE = ["#000000","#ffffff","#2f6bff","#7b3fe4","#e0338f","#ff3b30","#ff9500","#ffcc00","#34c759","#00c2a8","#0ea5e9","#1e3a8a","#8d5b3c","#9a9a9a","#f5e6d3","clear"];
 
@@ -261,20 +282,22 @@ $$("#fillSeg button").forEach(b => b.onclick = () => { S.fill=b.dataset.fill; $$
 
 /* ---------- tools ---------- */
 function setTool(t){
-  S.tool = t; $$(".tool").forEach(b => b.setAttribute("aria-pressed", b.dataset.tool===t));
+  if(t !== S.tool) commitFloat();
+  S.tool = t; $("#selHelp").hidden = t!=="select" || !!F; $$(".tool").forEach(b => b.setAttribute("aria-pressed", b.dataset.tool===t));
   $("#textOpts").hidden = t!=="text";
   $("#shapeOpts").hidden = !["circle","triangle","square"].includes(t);
   live.style.cursor = t==="text" ? "text" : t==="fill" ? "cell" : "crosshair";
+  renderLive();
 }
-$$(".tool").forEach(b => b.onclick = () => setTool(b.dataset.tool));
+$$(".tool[data-tool]").forEach(b => b.onclick = () => setTool(b.dataset.tool));
 setTool("brush");
 
 /* ---------- history ---------- */
 function snapshot(){ return ctx.getImageData(0,0,W,H); }
 function pushUndo(){ S.undo.push(snapshot()); if(S.undo.length>25) S.undo.shift(); S.redo=[]; updateUndo(); }
 function updateUndo(){ $("#undoBtn").disabled=!S.undo.length; $("#redoBtn").disabled=!S.redo.length; }
-function undo(){ if(!S.undo.length) return; S.redo.push(snapshot()); ctx.putImageData(S.undo.pop(),0,0); updateUndo(); changed(); }
-function redo(){ if(!S.redo.length) return; S.undo.push(snapshot()); ctx.putImageData(S.redo.pop(),0,0); updateUndo(); changed(); }
+function undo(){ if(F){ F=null; showSel(); } if(!S.undo.length){ renderLive(); return; } S.redo.push(snapshot()); ctx.putImageData(S.undo.pop(),0,0); updateUndo(); changed(); }
+function redo(){ commitFloat(); if(!S.redo.length) return; S.undo.push(snapshot()); ctx.putImageData(S.redo.pop(),0,0); updateUndo(); changed(); }
 $("#undoBtn").onclick=undo; $("#redoBtn").onclick=redo;
 function changed(){ $("#hint").hidden = true; clearTimeout(changed.t); changed.t = setTimeout(save, 500); }
 
@@ -292,10 +315,77 @@ function shapePath(c, a, b, shift){
 function drawShape(c, a, b, shift){ style(c); shapePath(c,a,b,shift); if(S.fill==="filled") c.fill(); else c.stroke(); }
 function snapLine(a, b, shift){ if(!shift) return b; const dx=b.x-a.x, dy=b.y-a.y, ang=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4), len=Math.hypot(dx,dy); return {x:a.x+Math.cos(ang)*len, y:a.y+Math.sin(ang)*len}; }
 
+/* ---------- selection, move & uploaded images ---------- */
+let drag = null; // {mode:"move"|"resize"|"marquee", ...}
+const px = () => W / live.getBoundingClientRect().width; // canvas units per screen pixel
+function corners(f){ return [[f.x,f.y],[f.x+f.w,f.y],[f.x+f.w,f.y+f.h],[f.x,f.y+f.h]]; }
+function hitHandle(f,p){ const r=16*px(); return corners(f).findIndex(([x,y]) => Math.abs(p.x-x)<=r && Math.abs(p.y-y)<=r); }
+function inside(f,p){ return p.x>=f.x && p.x<=f.x+f.w && p.y>=f.y && p.y<=f.y+f.h; }
+function renderLive(extra){
+  lctx.clearRect(0,0,W,H);
+  if(F){
+    lctx.drawImage(F.c, F.x, F.y, F.w, F.h);
+    const k=px(); lctx.save(); lctx.lineWidth=1.5*k; lctx.setLineDash([6*k,5*k]);
+    lctx.strokeStyle="#ffffff"; lctx.strokeRect(F.x,F.y,F.w,F.h); lctx.lineDashOffset=6*k; lctx.strokeStyle="#7b3fe4"; lctx.strokeRect(F.x,F.y,F.w,F.h);
+    lctx.setLineDash([]); const hs=7*k;
+    for(const [x,y] of corners(F)){ lctx.fillStyle="#fff"; lctx.fillRect(x-hs,y-hs,hs*2,hs*2); lctx.strokeStyle="#7b3fe4"; lctx.lineWidth=2*k; lctx.strokeRect(x-hs,y-hs,hs*2,hs*2); }
+    lctx.restore();
+  }
+  if(extra) extra();
+}
+function showSel(){ $("#selPanel").hidden = !F; $("#selHelp").hidden = S.tool!=="select" || !!F; }
+function liftRect(x,y,w,h){ // cut part of the drawing out so it can be moved
+  x=Math.max(0,Math.floor(x)); y=Math.max(0,Math.floor(y)); w=Math.min(W-x,Math.ceil(w)); h=Math.min(H-y,Math.ceil(h));
+  if(w<4||h<4) return;
+  pushUndo();
+  const c=document.createElement("canvas"); c.width=w; c.height=h; c.getContext("2d").drawImage(art,x,y,w,h,0,0,w,h);
+  ctx.clearRect(x,y,w,h);
+  F={c,x,y,w,h}; showSel(); renderLive();
+}
+function commitFloat(){
+  if(!F) return;
+  ctx.globalCompositeOperation="source-over";
+  ctx.drawImage(F.c, F.x, F.y, F.w, F.h);
+  F=null; showSel(); renderLive(); changed();
+}
+function selectAll(){ commitFloat(); if(S.tool!=="select") setTool("select"); liftRect(0,0,W,H); }
+$("#selAll").onclick = selectAll;
+$("#selDone").onclick = commitFloat;
+$("#selDel").onclick = () => { if(!F) return; F=null; showSel(); renderLive(); changed(); toast("Deleted — Undo brings it back"); };
+$("#selFlip").onclick = () => { if(!F) return; const c=document.createElement("canvas"); c.width=F.c.width; c.height=F.c.height; const x=c.getContext("2d"); x.translate(c.width,0); x.scale(-1,1); x.drawImage(F.c,0,0); F.c=c; renderLive(); };
+$("#selDup").onclick = () => { if(!F) return; pushUndo(); ctx.drawImage(F.c,F.x,F.y,F.w,F.h); F={...F, x:Math.min(F.x+30,W-F.w/2), y:Math.min(F.y+30,H-F.h/2)}; renderLive(); changed(); toast("Copied — drag the copy where you want it"); };
+
+function addImage(file){
+  if(!file || !/^image\//.test(file.type)){ toast("Please choose an image file (PNG, JPG, SVG…)"); return; }
+  const r=new FileReader();
+  r.onload=()=>{ const im=new Image(); im.onload=()=>{
+      commitFloat();
+      const max=1600, s0=Math.min(1, max/Math.max(im.naturalWidth||max, im.naturalHeight||max));
+      const c=document.createElement("canvas"); c.width=Math.max(1,Math.round((im.naturalWidth||600)*s0)); c.height=Math.max(1,Math.round((im.naturalHeight||600)*s0));
+      c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+      const fit=Math.min(W*.6/c.width, H*.6/c.height), w=c.width*fit, h=c.height*fit;
+      pushUndo(); setTool("select");
+      F={c, x:(W-w)/2, y:(H-h)/2, w, h}; showSel(); renderLive(); changed();
+      toast("Image added — drag to move, corners to resize");
+    }; im.onerror=()=>toast("That image couldn't be opened. Try a PNG or JPG."); im.src=r.result; };
+  r.readAsDataURL(file);
+}
+$("#imgBtn").onclick = () => $("#imgInput").click();
+$("#imgInput").addEventListener("change", e => { addImage(e.target.files[0]); e.target.value=""; });
+board.addEventListener("dragover", e => { if([...e.dataTransfer.types].includes("Files")) e.preventDefault(); });
+board.addEventListener("drop", e => { e.preventDefault(); addImage(e.dataTransfer.files[0]); });
+
 let down=null, last=null, pts=[];
 live.addEventListener("pointerdown", e => {
   if(e.button!==0) return; e.preventDefault(); live.setPointerCapture(e.pointerId);
   const p = pos(e);
+  if(F){
+    const h = hitHandle(F,p);
+    if(h>=0){ drag={mode:"resize", h, start:{...F}}; return; }
+    if(inside(F,p)){ drag={mode:"move", dx:p.x-F.x, dy:p.y-F.y}; live.style.cursor="grabbing"; return; }
+    commitFloat();
+  }
+  if(S.tool==="select"){ drag={mode:"marquee", a:p, b:p}; return; }
   if(S.tool==="text"){ placeText(p); return; }
   if(S.tool==="fill"){ pushUndo(); floodFill(Math.floor(p.x), Math.floor(p.y)); changed(); return; }
   pushUndo(); down=p; last=p; pts=[p];
@@ -303,13 +393,31 @@ live.addEventListener("pointerdown", e => {
 });
 live.addEventListener("pointermove", e => {
   const p = pos(e);
-  if(!down){ drawCursor(p); return; }
+  if(drag){
+    if(drag.mode==="move"){ F.x=p.x-drag.dx; F.y=p.y-drag.dy; renderLive(); }
+    else if(drag.mode==="resize"){
+      const s0=drag.start, [ax,ay]=corners(s0)[(drag.h+2)%4], sx=[-1,1,1,-1][drag.h], sy=[-1,-1,1,1][drag.h];
+      let w=Math.max(8,(p.x-ax)*sx), h=Math.max(8,(p.y-ay)*sy);
+      if(!e.shiftKey){ const k=Math.max(w/s0.w,h/s0.h); w=s0.w*k; h=s0.h*k; }
+      F.w=w; F.h=h; F.x= sx>0 ? ax : ax-w; F.y= sy>0 ? ay : ay-h; renderLive();
+    } else { drag.b=p; const a=drag.a; renderLive(() => { const k=px(); lctx.save(); lctx.setLineDash([6*k,5*k]); lctx.lineWidth=1.5*k; lctx.strokeStyle="#7b3fe4"; lctx.fillStyle="rgba(123,63,228,.08)";
+      lctx.fillRect(a.x,a.y,p.x-a.x,p.y-a.y); lctx.strokeRect(a.x,a.y,p.x-a.x,p.y-a.y); lctx.restore(); }); }
+    return;
+  }
+  if(F){ const h=hitHandle(F,p); live.style.cursor = h===0||h===2 ? "nwse-resize" : h===1||h===3 ? "nesw-resize" : inside(F,p) ? "move" : S.tool==="select" ? "crosshair" : live.style.cursor; }
+  if(!down){ if(!F) drawCursor(p); return; }
   if(S.tool==="brush"||S.tool==="eraser"){ stroke(last,p); last=p; }
   else { lctx.clearRect(0,0,W,H);
     if(S.tool==="line"){ style(lctx); const q=snapLine(down,p,e.shiftKey); lctx.beginPath(); lctx.moveTo(down.x,down.y); lctx.lineTo(q.x,q.y); lctx.stroke(); }
     else drawShape(lctx, down, p, e.shiftKey); }
 });
 function finish(e){
+  if(drag){
+    const d=drag; drag=null; live.style.cursor="crosshair";
+    if(d.mode==="marquee"){ renderLive(); const a=d.a, b=pos(e); liftRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y)); }
+    else { renderLive(); changed(); }
+    return;
+  }
   if(!down) return; const p = pos(e);
   lctx.clearRect(0,0,W,H);
   if(S.tool==="line"){ style(ctx); const q=snapLine(down,p,e.shiftKey); ctx.beginPath(); ctx.moveTo(down.x,down.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
@@ -319,7 +427,7 @@ function finish(e){
 }
 live.addEventListener("pointerup", finish);
 live.addEventListener("pointercancel", finish);
-live.addEventListener("pointerleave", () => { if(!down) lctx.clearRect(0,0,W,H); });
+live.addEventListener("pointerleave", () => { if(!down && !drag) renderLive(); });
 function stroke(a,b){
   style(ctx);
   ctx.globalCompositeOperation = S.tool==="eraser" ? "destination-out" : "source-over";
@@ -386,10 +494,11 @@ $("#clearBtn").onclick = () => {
 function exportCanvas(){
   const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
   if(S.bg!=="transparent"){ x.fillStyle = S.bg==="color" ? S.bgColor : S.bg; x.fillRect(0,0,W,H); }
-  x.drawImage(art,0,0); return c;
+  x.drawImage(art,0,0); if(F) x.drawImage(F.c,F.x,F.y,F.w,F.h); return c;
 }
-function isEmpty(){ const d=ctx.getImageData(0,0,W,H).data; for(let i=3;i<d.length;i+=16) if(d[i]) return false; return true; }
+function isEmpty(){ if(F) return false; const d=ctx.getImageData(0,0,W,H).data; for(let i=3;i<d.length;i+=16) if(d[i]) return false; return true; }
 function download(){
+  commitFloat();
   if(isEmpty()){ toast("Draw something first"); return; }
   exportCanvas().toBlob(b => { const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download="my-logo.png"; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); toast("Downloading my-logo.png"); }, "image/png");
 }
@@ -397,6 +506,7 @@ $("#dlBtn").onclick=download; $("#dlBtn2").onclick=download;
 
 /* ---------- send to Pixel & Brush ---------- */
 $("#sendBtn").onclick = () => {
+  commitFloat();
   if(isEmpty()){ toast("Draw your logo idea first"); return; }
   $("#sendPreview").src = exportCanvas().toDataURL("image/png");
   $("#sendMsg").textContent=""; $("#sendWa").hidden=true; $("#sendGo").hidden=false;
@@ -434,15 +544,20 @@ document.addEventListener("keydown", e => {
   const k=e.key.toLowerCase(), mod=e.ctrlKey||e.metaKey;
   if(mod && k==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
   if(mod && k==="y"){ e.preventDefault(); redo(); return; }
-  if(e.key==="Escape") $("#sendModal").hidden=true;
-  const map={b:"brush",l:"line",e:"eraser",c:"circle",t:"triangle",s:"square",x:"text",f:"fill"};
+  if(e.key==="Escape"){ if(!$("#sendModal").hidden) $("#sendModal").hidden=true; else commitFloat(); }
+  if(F && (e.key==="Delete"||e.key==="Backspace")){ e.preventDefault(); $("#selDel").click(); return; }
+  if(F && e.key==="Enter"){ e.preventDefault(); commitFloat(); return; }
+  if(F && e.key.startsWith("Arrow")){ e.preventDefault(); const n=e.shiftKey?10:2; if(e.key==="ArrowLeft")F.x-=n; if(e.key==="ArrowRight")F.x+=n; if(e.key==="ArrowUp")F.y-=n; if(e.key==="ArrowDown")F.y+=n; renderLive(); changed(); return; }
+  if(mod && k==="a"){ e.preventDefault(); selectAll(); return; }
+  if(!mod && k==="i"){ $("#imgInput").click(); return; }
+  const map={v:"select",b:"brush",l:"line",e:"eraser",c:"circle",t:"triangle",s:"square",x:"text",f:"fill"};
   if(!mod && map[k]) setTool(map[k]);
   if(k==="[" ) { $("#size").value=Math.max(1,S.size-4); $("#size").dispatchEvent(new Event("input")); }
   if(k==="]" ) { $("#size").value=Math.min(120,S.size+4); $("#size").dispatchEvent(new Event("input")); }
 });
 
 /* ---------- save in this browser ---------- */
-function save(){ try{ localStorage.setItem(STORE, JSON.stringify({img: isEmpty()?null:art.toDataURL("image/png"), bg:S.bg, bgColor:S.bgColor, color:S.color, recent:S.recent})); }catch(e){} }
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify({img: isEmpty()?null:(()=>{ const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d"); x.drawImage(art,0,0); if(F) x.drawImage(F.c,F.x,F.y,F.w,F.h); return c.toDataURL("image/png"); })(), bg:S.bg, bgColor:S.bgColor, color:S.color, recent:S.recent})); }catch(e){} }
 function restore(){
   try{ const o=JSON.parse(localStorage.getItem(STORE)||"null"); if(!o) return;
     if(o.recent) S.recent=o.recent; if(o.color) setColor(o.color,false);
