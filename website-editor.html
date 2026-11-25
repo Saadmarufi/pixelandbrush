@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Free Website Editor | Pixel and Brush</title>
+<meta name="description" content="Upload your website's HTML, CSS and JavaScript and edit it visually with no coding. Change text, colours, images and layout, then download the finished code. Free tool by Pixel and Brush.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://pixelandbrush.com/website-editor.html">
+<meta name="theme-color" content="#07081a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pixel and Brush">
+<meta property="og:title" content="Free Website Editor | Pixel and Brush">
+<meta property="og:description" content="Upload your website's HTML, CSS and JavaScript and edit it visually with no coding. Change text, colours, images and layout, then download the finished code. Free tool by Pixel and Brush.">
+<meta property="og:url" content="https://pixelandbrush.com/website-editor.html">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Pixel and Brush Website Editor", "url": "https://pixelandbrush.com/website-editor.html", "applicationCategory": "DesignApplication", "operatingSystem": "Any (web browser)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CAD"}, "description": "Upload your website's HTML, CSS and JavaScript and edit it visually with no coding. Change text, colours, images and layout, then download the finished code. Free tool by Pixel and Brush.", "provider": {"@id": "https://pixelandbrush.com/#business"}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+/* Layout: workbench — files & layers left, live canvas center, inspector right; stacks on phones */
+:root{
+  --bg:#07081a; --panel:#0d0f2a; --panel-2:#15183a; --line:#262a52; --fg:#eef0ff; --muted:#a5a9cf;
+  --accent:#7b3fe4; --accent-fg:#ffffff; --accent-soft:#251c52; --danger:#ff7a9c; --ok:#25d366;
+  --grad:linear-gradient(120deg,#2f6bff 0%,#7b3fe4 50%,#e0338f 100%);
+  --font-ui:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:8px; color-scheme:dark;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:13px;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(0,1fr);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;letter-spacing:-.01em;margin-right:6px}
+.brand svg{flex:none}
+.top .grow{flex:1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel-2)}
+.seg button{border:0;background:transparent;padding:6px 10px;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:6px 11px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed;border-color:var(--line)}
+.btn.primary{background:var(--grad);color:#fff;border-color:transparent}
+.brand a{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none;font-family:"Sora",var(--font-ui)}
+.brand small{font-weight:600;color:var(--muted);font-family:var(--font-ui);font-size:12px;border-left:1px solid var(--line);padding-left:8px;margin-left:2px}
+.toplink{color:var(--muted);text-decoration:none;font-weight:600;padding:6px 8px;border-radius:var(--r)}
+.toplink:hover{color:var(--fg);background:var(--panel-2)}
+.btn.danger{color:var(--danger)}
+.btn.sm{padding:4px 8px;font-size:12px}
+
+.work{display:grid;grid-template-columns:250px minmax(0,1fr) 300px;min-height:0}
+.side{background:var(--panel);border-right:1px solid var(--line);overflow:auto;min-height:0}
+.side.right{border-right:0;border-left:1px solid var(--line)}
+.sec{padding:12px 14px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.sec h3{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.files{display:grid;gap:2px}
+.file{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:6px;cursor:pointer;border:0;background:transparent;text-align:left;width:100%}
+.file:hover{background:var(--panel-2)}
+.file[aria-current="true"]{background:var(--accent-soft);font-weight:700}
+.file .tag{font-family:var(--font-code);font-size:10px;padding:1px 5px;border-radius:4px;background:var(--panel-2);color:var(--muted);min-width:32px;text-align:center;border:1px solid var(--line)}
+.file .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:12px;text-align:center;color:var(--muted);display:grid;gap:8px}
+.drop .row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.palette{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.palette button{justify-content:flex-start}
+.layers{font-size:12px;display:block;max-height:340px;overflow:auto}
+.layer{display:block;line-height:1.5;margin-bottom:1px;border:0;background:transparent;text-align:left;padding:3px 6px;border-radius:5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.layer:hover{background:var(--panel-2)}
+.layer[aria-current="true"]{background:var(--accent);color:var(--accent-fg)}
+.layer .t{font-family:var(--font-code);font-size:11px}
+.layer .d{opacity:.65;margin-left:6px}
+.layer.hid{opacity:.5;text-decoration:line-through}
+
+.stage{display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(0,1fr);min-height:0;min-width:0}
+.crumbs{display:flex;gap:2px;align-items:center;padding:6px 12px;background:var(--panel-2);border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;min-height:31px;font-family:var(--font-code);font-size:11px;color:var(--muted)}
+.crumbs button{border:0;background:transparent;cursor:pointer;padding:2px 5px;border-radius:4px;color:inherit;font:inherit}
+.crumbs button:hover{background:var(--panel)}
+.crumbs button:last-child{color:var(--accent);font-weight:600}
+.canvas{overflow:auto;padding:18px;display:flex;justify-content:center;min-height:0}
+.frame-wrap{width:100%;height:100%;min-height:480px;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 8px 28px rgba(20,30,50,.10);overflow:hidden;transition:width .2s ease;position:relative}
+.frame-wrap iframe{border:0;width:100%;height:100%;display:block;background:#fff}
+.hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;pointer-events:none;opacity:.92;white-space:nowrap}
+
+.insp-empty{padding:28px 18px;color:var(--muted);line-height:1.55}
+.insp-empty b{color:var(--fg)}
+.eltitle{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.eltitle code{font-family:var(--font-code);font-size:13px;font-weight:600;background:var(--accent-soft);color:var(--accent);padding:2px 7px;border-radius:5px}
+.acts{display:flex;flex-wrap:wrap;gap:5px}
+.field{display:grid;gap:4px}
+.field>span{font-size:11px;color:var(--muted);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inp{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding:6px 8px;min-width:0}
+textarea.inp{resize:vertical;min-height:64px;font-family:var(--font-ui)}
+.unit{display:flex;align-items:center;border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding-right:7px}
+.unit input{border:0;background:transparent;padding:6px 8px;width:100%;min-width:0}
+.unit small{color:var(--muted);font-size:11px}
+.color{display:flex;gap:6px;align-items:center}
+.color input[type=color]{width:32px;height:30px;padding:0;border:1px solid var(--line);border-radius:6px;background:none;cursor:pointer;flex:none}
+.color .inp{font-family:var(--font-code);font-size:12px}
+.align{display:flex}
+.align button{flex:1}
+.check{display:flex;align-items:center;gap:8px;cursor:pointer}
+
+.modal-bg{position:fixed;inset:0;background:rgba(10,14,22,.5);display:grid;place-items:center;z-index:50;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(1000px,100%);max-height:100%;display:grid;grid-template-rows:auto auto 1fr auto;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.modal header h2{margin:0;font-size:16px}
+.tabs{display:flex;gap:4px;padding:8px 12px 0;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{border:1px solid transparent;border-bottom:0;background:transparent;padding:7px 12px;border-radius:7px 7px 0 0;cursor:pointer;font-family:var(--font-code);font-size:12px;color:var(--muted);white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--panel-2);border-color:var(--line);color:var(--fg);font-weight:600}
+.codebox{overflow:auto;background:var(--panel-2);min-height:200px}
+.codebox pre{margin:0;padding:14px 16px;font-family:var(--font-code);font-size:12px;line-height:1.55;white-space:pre;tab-size:2}
+.modal footer{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.modal footer .note{margin-right:auto;color:var(--muted);font-size:12px}
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:600;z-index:60;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.banner{display:flex;gap:8px;align-items:center;padding:8px 12px;background:var(--accent-soft);color:var(--fg);font-size:12px;border-bottom:1px solid var(--line)}
+.dragover .canvas{outline:3px dashed var(--accent);outline-offset:-10px}
+
+@media (max-width:980px){
+  .app{height:auto;min-height:100%}
+  .work{grid-template-columns:minmax(0,1fr)}
+  .brand small{display:none}
+  .stage{order:-1}
+  .frame-wrap{height:70vh}
+  .side,.side.right{border:0;border-top:1px solid var(--line)}
+  .top{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+}
+@media (prefers-reduced-motion:reduce){.frame-wrap{transition:none}}
+</style>
+
+</head>
+<body>
+<div class="app" id="app">
+  <div class="top">
+    <div class="brand"><a href="index.html" aria-label="Pixel and Brush home"><svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/><rect x="9" y="12" width="7" height="7" rx="1.8" fill="#2f6bff"/><rect x="18" y="12" width="7" height="7" rx="1.8" fill="#3d63f5"/><rect x="9" y="21" width="7" height="7" rx="1.8" fill="#4a5bef"/><rect x="18" y="21" width="7" height="7" rx="1.8" fill="#2f6bff" opacity=".35"/><path d="M37.5 10.5c1.2 1 1 2.6-.2 3.8L27 26.5l-3-2.6 11.3-12.9c.6-.7 1.5-1 2.2-.5Z" fill="#7b3fe4"/><path d="M23.2 24.6l3 2.7c-.6 3.4-3 6.6-7.6 7.7-1.6.4-3.3.3-4.6-.3 2.6-1 3.6-2.6 4.6-4.9 1-2.4 2.5-4.4 4.6-5.2Z" fill="#e0338f"/></svg>PIXEL &amp; BRUSH</a><small>Website Editor</small></div>
+    <div class="seg" role="group" aria-label="Mode">
+      <button id="modeEdit" aria-pressed="true">Edit</button>
+      <button id="modePreview" aria-pressed="false">Preview (runs JS)</button>
+    </div>
+    <div class="seg" role="group" aria-label="Screen size">
+      <button data-w="100%" aria-pressed="true" title="Desktop">Desktop</button>
+      <button data-w="768px" aria-pressed="false" title="Tablet, 768px">Tablet</button>
+      <button data-w="390px" aria-pressed="false" title="Phone, 390px">Phone</button>
+    </div>
+    <button class="btn" id="undoBtn" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+    <button class="btn" id="redoBtn" title="Redo (Ctrl+Shift+Z)" disabled>↷ Redo</button>
+    <span class="grow"></span>
+    <a class="toplink" href="https://wa.me/pixelandbrush1" target="_blank" rel="noopener">Need help?</a>
+    <button class="btn" id="uploadTop">Upload files</button>
+    <button class="btn primary" id="getCode">Get complete code</button>
+  </div>
+
+  <div class="work">
+    <aside class="side">
+      <div class="sec">
+        <h3>Project files <span id="fileCount"></span></h3>
+        <div class="files" id="files"></div>
+        <div class="drop">
+          <div>Drop HTML, CSS, JS, images or a .zip here</div>
+          <div class="row">
+            <button class="btn sm" id="pickFiles">Choose files</button>
+            <button class="btn sm" id="pickFolder">Choose folder</button>
+          </div>
+          <div class="row"><button class="btn sm" id="loadSample">Load sample</button><button class="btn sm danger" id="clearAll">Start empty</button></div>
+        </div>
+        <input type="file" id="fileInput" multiple hidden accept=".html,.htm,.css,.js,.mjs,.json,.svg,.png,.jpg,.jpeg,.gif,.webp,.ico,.zip,.txt">
+        <input type="file" id="folderInput" webkitdirectory multiple hidden>
+      </div>
+      <div class="sec">
+        <h3>Add element <span style="text-transform:none;letter-spacing:0;font-weight:500">after selection</span></h3>
+        <div class="palette" id="palette">
+          <button class="btn sm" data-add="h2">Heading</button>
+          <button class="btn sm" data-add="p">Paragraph</button>
+          <button class="btn sm" data-add="button">Button</button>
+          <button class="btn sm" data-add="a">Link</button>
+          <button class="btn sm" data-add="img">Image</button>
+          <button class="btn sm" data-add="ul">List</button>
+          <button class="btn sm" data-add="section">Section</button>
+          <button class="btn sm" data-add="hr">Divider</button>
+        </div>
+      </div>
+      <div class="sec">
+        <h3>Layers</h3>
+        <div class="layers" id="layers"></div>
+      </div>
+    </aside>
+
+    <main class="stage">
+      <div>
+        <div class="banner" id="sampleBanner" hidden>This is a sample page. Upload your own website files to edit them. Your files stay on your computer and are never uploaded to us.</div>
+        <div class="crumbs" id="crumbs">Click anything on the page to select it. Double-click text to type.</div>
+      </div>
+      <div class="canvas">
+        <div class="frame-wrap" id="frameWrap">
+          <iframe id="editFrame" title="Editable page"></iframe>
+          <iframe id="previewFrame" title="Live preview" sandbox="allow-scripts allow-forms allow-modals allow-popups" hidden></iframe>
+          <div class="hint" id="hint" hidden></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="side right" id="inspector">
+      <div class="insp-empty" id="inspEmpty">
+        <b>Nothing selected.</b><br>Click an element on the page, or pick one from Layers. You can then change its text, colors, size, spacing and images here — no code needed.<br><br>
+        <b>Tips</b><br>Double-click text to type directly on the page.<br>Delete key removes the selected element.<br>Ctrl+Z undoes, Ctrl+Shift+Z redoes.
+      </div>
+      <div id="inspBody" hidden>
+        <div class="sec">
+          <div class="eltitle"><code id="elTag">div</code><span id="elDesc" style="color:var(--muted)"></span></div>
+          <div class="acts">
+            <button class="btn sm" id="aParent" title="Select the element that contains this one">↑ Parent</button>
+            <button class="btn sm" id="aUp" title="Move earlier">Move up</button>
+            <button class="btn sm" id="aDown" title="Move later">Move down</button>
+            <button class="btn sm" id="aDup">Duplicate</button>
+            <button class="btn sm danger" id="aDel">Delete</button>
+          </div>
+        </div>
+        <div class="sec" id="secContent">
+          <h3>Content</h3>
+          <label class="field" id="fText"><span>Text</span><textarea class="inp" id="iText"></textarea></label>
+          <div id="fLink" class="grid2" style="grid-template-columns:1fr">
+            <label class="field"><span>Link goes to</span><input class="inp" id="iHref" placeholder="https://…"></label>
+            <label class="check"><input type="checkbox" id="iBlank"> Open in a new tab</label>
+          </div>
+          <div id="fImg" class="field">
+            <span>Image</span>
+            <div class="acts"><button class="btn sm" id="iImgUp">Replace image…</button></div>
+            <input type="file" id="imgInput" accept="image/*" hidden>
+            <label class="field"><span>Image address</span><input class="inp" id="iSrc"></label>
+            <label class="field"><span>Description (alt text)</span><input class="inp" id="iAlt"></label>
+          </div>
+          <label class="field" id="fPh"><span>Placeholder</span><input class="inp" id="iPh"></label>
+          <div class="grid2">
+            <label class="field"><span>ID</span><input class="inp" id="iId"></label>
+            <label class="field"><span>Classes</span><input class="inp" id="iClass"></label>
+          </div>
+        </div>
+        <div class="sec">
+          <h3>Text style</h3>
+          <div class="grid2">
+            <label class="field"><span>Size</span><span class="unit"><input type="number" min="0" data-style="font-size" data-unit="px"><small>px</small></span></label>
+            <label class="field"><span>Weight</span>
+              <select class="inp" data-style="font-weight"><option value="">Default</option><option value="300">Light</option><option value="400">Regular</option><option value="500">Medium</option><option value="600">Semibold</option><option value="700">Bold</option><option value="800">Extra bold</option></select></label>
+          </div>
+          <label class="field"><span>Font</span>
+            <select class="inp" data-style="font-family">
+              <option value="">Default</option>
+              <option value="system-ui, -apple-system, 'Segoe UI', sans-serif">System sans</option>
+              <option value="Arial, Helvetica, sans-serif">Arial</option>
+              <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+              <option value="'Times New Roman', Times, serif">Times</option>
+              <option value="Verdana, Geneva, sans-serif">Verdana</option>
+              <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+              <option value="ui-monospace, Menlo, Consolas, monospace">Monospace</option>
+            </select></label>
+          <div class="field"><span>Color</span><div class="color"><input type="color" data-color="color"><input class="inp" data-style="color" placeholder="default"></div></div>
+          <div class="field"><span>Alignment</span>
+            <div class="seg align" id="alignSeg">
+              <button data-align="left">Left</button><button data-align="center">Center</button><button data-align="right">Right</button><button data-align="justify">Justify</button>
+            </div></div>
+          <label class="field"><span>Line height</span><input class="inp" data-style="line-height" placeholder="e.g. 1.5"></label>
+        </div>
+        <div class="sec">
+          <h3>Box</h3>
+          <div class="field"><span>Background</span><div class="color"><input type="color" data-color="background-color"><input class="inp" data-style="background-color" placeholder="none"></div></div>
+          <div class="grid2">
+            <label class="field"><span>Padding ↕</span><span class="unit"><input type="number" min="0" data-style="padding-top,padding-bottom" data-unit="px"><small>px</small></span></label>
+            <label class="field"><span>Padding ↔</span><span class="unit"><input type="number" min="0" data-style="padding-left,padding-right" data-unit="px"><small>px</small></span></label>
+            <label class="field"><span>Space above/below</span><span class="unit"><input type="number" data-style="margin-top,margin-bottom" data-unit="px"><small>px</small></span></label>
+            <label class="field"><span>Corner radius</span><span class="unit"><input type="number" min="0" data-style="border-radius" data-unit="px"><small>px</small></span></label>
+            <label class="field"><span>Width</span><input class="inp" data-style="width" placeholder="auto, 100%, 300px"></label>
+            <label class="field"><span>Max width</span><input class="inp" data-style="max-width" placeholder="none"></label>
+          </div>
+          <div class="grid2">
+            <label class="field"><span>Border</span><span class="unit"><input type="number" min="0" id="iBw"><small>px</small></span></label>
+            <div class="field"><span>Border color</span><div class="color"><input type="color" id="iBc"></div></div>
+          </div>
+          <label class="field"><span>Opacity <span id="opVal"></span></span><input type="range" min="0" max="100" id="iOp"></label>
+          <label class="check"><input type="checkbox" id="iHide"> Hide this element</label>
+          <button class="btn sm" id="aReset">Clear all style changes on this element</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal-bg" id="codeModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
+    <header><h2 id="codeTitle">Your complete code</h2><button class="btn" id="closeCode">Close</button></header>
+    <div class="tabs" id="codeTabs" role="tablist"></div>
+    <div class="codebox"><pre id="codePre"></pre></div>
+    <footer>
+      <span class="note" id="codeNote"></span>
+      <button class="btn" id="copyCode">Copy this file</button>
+      <button class="btn" id="dlSingle">Download as one HTML file</button>
+      <button class="btn primary" id="dlZip">Download all files (.zip)</button>
+    </footer>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const IMG_EXT = {png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',svg:'image/svg+xml',ico:'image/x-icon',avif:'image/avif'};
+const TEXT_EXT = ['html','htm','css','js','mjs','json','txt','md','xml'];
+const STORE_KEY = 'pb-website-editor-v1';
+
+const S = { files:{}, page:null, sel:null, undo:[], redo:[], last:'', mode:'edit', dirty:false, sample:false, doctype:'<!DOCTYPE html>' };
+const editFrame = $('#editFrame'), previewFrame = $('#previewFrame');
+let FD = null; // edit frame document
+
+/* ---------- helpers ---------- */
+const ext = n => (n.split('.').pop()||'').toLowerCase();
+function kindOf(n){ const e=ext(n); if(e==='html'||e==='htm')return 'html'; if(e==='css')return 'css'; if(e==='js'||e==='mjs')return 'js'; if(IMG_EXT[e])return 'image'; return TEXT_EXT.includes(e)?'text':'other'; }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2200); }
+function dirOf(p){ const i=p.lastIndexOf('/'); return i<0?'':p.slice(0,i+1); }
+function normPath(p){ const out=[]; for(const s of p.split('/')){ if(s===''||s==='.')continue; if(s==='..')out.pop(); else out.push(s);} return out.join('/'); }
+function resolveRef(ref, from){
+  if(!ref) return null;
+  ref = ref.trim();
+  if(/^([a-z]+:|\/\/|#)/i.test(ref)) return null;
+  let clean = ref.split('#')[0].split('?')[0];
+  try{ clean = decodeURIComponent(clean); }catch(e){}
+  const p = clean.startsWith('/') ? normPath(clean) : normPath(dirOf(from||'') + clean);
+  if(S.files[p]) return p;
+  const base = clean.split('/').pop();
+  const hit = Object.keys(S.files).find(k => k.split('/').pop() === base);
+  return hit || null;
+}
+function cssWithImages(css, from){
+  return css.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g, (m,q,u) => {
+    const p = resolveRef(u, from); return (p && S.files[p].kind==='image') ? `url("${S.files[p].data}")` : m;
+  });
+}
+function rgbToHex(c){
+  const m = /rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)(?:[ ,/]+([\d.]+))?/.exec(c||''); if(!m) return null;
+  if(m[4]!==undefined && parseFloat(m[4])===0) return null;
+  return '#'+[m[1],m[2],m[3]].map(x=>(+x).toString(16).padStart(2,'0')).join('');
+}
+function htmlPages(){ return Object.keys(S.files).filter(k=>S.files[k].kind==='html').sort((a,b)=> (b.endsWith('index.html')-a.endsWith('index.html')) || a.localeCompare(b)); }
+
+/* ---------- persistence ---------- */
+function save(){
+  clearTimeout(save.t);
+  save.t = setTimeout(()=>{
+    try{ commit(); localStorage.setItem(STORE_KEY, JSON.stringify({files:S.files, page:S.page, sample:S.sample})); }catch(e){}
+  }, 600);
+}
+function loadSaved(){
+  try{ const raw=localStorage.getItem(STORE_KEY); if(!raw) return false; const d=JSON.parse(raw); if(!d||!d.files||!Object.keys(d.files).length) return false; S.files=d.files; S.page=d.page; S.sample=!!d.sample; return true; }catch(e){ return false; }
+}
+
+/* ---------- reading uploads ---------- */
+function readFile(file, path){
+  return new Promise(res=>{
+    const k = kindOf(path), r = new FileReader();
+    r.onload = () => res({path, kind:k, data:r.result});
+    r.onerror = () => res(null);
+    if(k==='image'||k==='other') r.readAsDataURL(file); else r.readAsText(file);
+  });
+}
+function stripCommonRoot(items){
+  if(!items.length || !items.every(i=>i.path.includes('/'))) return items;
+  const f = items[0].path.split('/')[0];
+  if(items.every(i=>i.path.startsWith(f+'/'))) return stripCommonRoot(items.map(i=>({...i, path:i.path.slice(f.length+1)})));
+  return items;
+}
+async function readZip(file){
+  if(!window.JSZip){ toast('Zip support could not load. Upload the files directly.'); return []; }
+  const zip = await JSZip.loadAsync(file); const out=[];
+  for(const [name, entry] of Object.entries(zip.files)){
+    if(entry.dir || /(^|\/)(__MACOSX|\.DS_Store)/.test(name)) continue;
+    const k = kindOf(name);
+    if(k==='image'||k==='other'){ const b64=await entry.async('base64'); out.push({path:name, kind:k, data:`data:${IMG_EXT[ext(name)]||'application/octet-stream'};base64,${b64}`}); }
+    else out.push({path:name, kind:k, data:await entry.async('string')});
+  }
+  return out;
+}
+async function ingest(fileList, useRelative){
+  let items=[];
+  for(const f of fileList){
+    if(ext(f.name)==='zip'){ items.push(...await readZip(f)); continue; }
+    const path = (useRelative && f.webkitRelativePath) ? f.webkitRelativePath : f.name;
+    const it = await readFile(f, path); if(it) items.push(it);
+  }
+  items = stripCommonRoot(items).filter(i=>!/(^|\/)(node_modules|\.git)\//.test(i.path));
+  if(!items.length){ toast('No usable files found.'); return; }
+  if(S.sample || items.some(i=>i.kind==='html')) S.files={};
+  else commit();
+  for(const i of items) S.files[i.path] = {kind:i.kind, data:i.data};
+  S.sample=false;
+  const pages = htmlPages();
+  if(!pages.length){
+    S.files['index.html'] = {kind:'html', data:starterHtml()};
+    toast('No HTML file found, so a starter page was created that links your files.');
+  }
+  S.page = htmlPages()[0];
+  S.undo=[]; S.redo=[]; S.dirty=false;
+  renderFiles(); openPage(S.page); save();
+  toast(`Loaded ${items.length} file${items.length>1?'s':''}`);
+}
+function starterHtml(){
+  const css = Object.keys(S.files).filter(k=>S.files[k].kind==='css').map(k=>`  <link rel="stylesheet" href="${k}">`).join('\n');
+  const js = Object.keys(S.files).filter(k=>S.files[k].kind==='js').map(k=>`  <script src="${k}"><\/script>`).join('\n');
+  return `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>My page</title>\n${css}\n</head>\n<body>\n  <h1>My page</h1>\n  <p>Start editing.</p>\n${js}\n</body>\n</html>\n`;
+}
+
+/* ---------- building the editable document ---------- */
+const EDITOR_CSS = `[data-pt-hover]{outline:1px dashed #3b6cff!important;outline-offset:-1px!important}
+[data-pt-sel]{outline:2px solid #3b6cff!important;outline-offset:-2px!important}
+[data-pt-ce]{outline:2px solid #e0a100!important;cursor:text!important}
+html,body{min-height:100%}`;
+
+function buildDoc(page, forEdit){
+  const src = S.files[page].data;
+  const dt = /^\s*(<!doctype[^>]*>)/i.exec(src); S.doctype = dt ? dt[1] : '<!DOCTYPE html>';
+  const doc = new DOMParser().parseFromString(src, 'text/html');
+  $$('link[href]', doc).forEach(l => {
+    if(!/(^|\s)stylesheet(\s|$)/i.test(l.getAttribute('rel')||'')) return;
+    const p = resolveRef(l.getAttribute('href'), page); if(!p || S.files[p].kind!=='css') return;
+    const s = doc.createElement('style'); s.setAttribute('data-pt-src', l.getAttribute('href'));
+    if(l.getAttribute('media')) s.setAttribute('media', l.getAttribute('media'));
+    s.textContent = cssWithImages(S.files[p].data, p); l.replaceWith(s);
+  });
+  $$('style:not([data-pt-src])', doc).forEach(s => { s.textContent = cssWithImages(s.textContent, page); });
+  $$('script', doc).forEach(s => {
+    const src = s.getAttribute('src');
+    if(src){ const p = resolveRef(src, page); if(p && S.files[p].kind==='js'){ s.removeAttribute('src'); s.setAttribute('data-pt-src', src); s.textContent = S.files[p].data; } }
+    if(forEdit){ if(s.hasAttribute('type')) s.setAttribute('data-pt-type', s.getAttribute('type')); s.setAttribute('type','text/pt-off'); }
+  });
+  $$('[src]', doc).forEach(el => {
+    if(el.tagName==='SCRIPT'||el.tagName==='IFRAME') return;
+    const orig = el.getAttribute('src'); const p = resolveRef(orig, page);
+    if(p && S.files[p].kind==='image'){ el.setAttribute('data-pt-img', orig); el.setAttribute('src', S.files[p].data); }
+  });
+  $$('link[rel~="icon"][href]', doc).forEach(l => { const p=resolveRef(l.getAttribute('href'),page); if(p&&S.files[p].kind==='image'){ l.setAttribute('data-pt-href', l.getAttribute('href')); l.setAttribute('href', S.files[p].data);} });
+  if(forEdit){
+    $$('*', doc).forEach(el => { for(const a of [...el.attributes]){ if(/^on/i.test(a.name)){ el.setAttribute('data-pt-'+a.name, a.value); el.removeAttribute(a.name); } } });
+    const st = doc.createElement('style'); st.setAttribute('data-pt-editor',''); st.textContent = EDITOR_CSS; doc.head.appendChild(st);
+  }
+  return S.doctype + '\n' + doc.documentElement.outerHTML;
+}
+
+/* Turn the edited document back into real source code.
+   mode 'separate' restores <link>/<script src>/image paths; 'single' keeps everything inline. */
+function exportDoc(mode){
+  if(!FD) return S.files[S.page]?.data || '';
+  finishTextEdit();
+  const root = FD.documentElement.cloneNode(true);
+  $$('[data-pt-editor]', root).forEach(n=>n.remove());
+  $$('*', root).forEach(el => {
+    el.removeAttribute('data-pt-hover'); el.removeAttribute('data-pt-sel');
+    if(el.hasAttribute('data-pt-ce')){ el.removeAttribute('data-pt-ce'); el.removeAttribute('contenteditable'); }
+    for(const a of [...el.attributes]){ if(/^data-pt-on/i.test(a.name)){ el.setAttribute(a.name.slice(8), a.value); el.removeAttribute(a.name); } }
+    if(el.getAttribute('style')==='') el.removeAttribute('style');
+  });
+  $$('script', root).forEach(s => {
+    if(s.hasAttribute('data-pt-type')){ s.setAttribute('type', s.getAttribute('data-pt-type')); s.removeAttribute('data-pt-type'); }
+    else if(s.getAttribute('type')==='text/pt-off') s.removeAttribute('type');
+    const src = s.getAttribute('data-pt-src');
+    if(src){ s.removeAttribute('data-pt-src'); if(mode==='separate'){ s.setAttribute('src', src); s.textContent=''; } }
+  });
+  $$('style[data-pt-src]', root).forEach(s => {
+    const href = s.getAttribute('data-pt-src');
+    if(mode==='separate'){ const l = FD.createElement('link'); l.setAttribute('rel','stylesheet'); l.setAttribute('href', href); if(s.getAttribute('media')) l.setAttribute('media', s.getAttribute('media')); s.replaceWith(l); }
+    else s.removeAttribute('data-pt-src');
+  });
+  $$('[data-pt-img]', root).forEach(el => { if(mode==='separate') el.setAttribute('src', el.getAttribute('data-pt-img')); el.removeAttribute('data-pt-img'); });
+  $$('[data-pt-href]', root).forEach(el => { if(mode==='separate') el.setAttribute('href', el.getAttribute('data-pt-href')); el.removeAttribute('data-pt-href'); });
+  if(mode==='separate'){
+    // put data: URLs back to file paths inside page <style> blocks
+    $$('style', root).forEach(s => { let t=s.textContent; for(const [k,f] of Object.entries(S.files)){ if(f.kind==='image' && t.includes(f.data)) t=t.split(f.data).join(relFrom(S.page,k)); } s.textContent=t; });
+  }
+  return S.doctype + '\n' + root.outerHTML + '\n';
+}
+function relFrom(page, target){ const d=dirOf(page); return d && target.startsWith(d) ? target.slice(d.length) : target; }
+function commit(){ if(S.dirty && FD && S.page && S.files[S.page]){ S.files[S.page].data = exportDoc('separate'); S.dirty=false; } }
+
+/* ---------- edit frame ---------- */
+function openPage(page){
+  if(!page || !S.files[page]){ FD=null; editFrame.srcdoc='<p style="font:14px system-ui;padding:24px;color:#666">Upload files to begin.</p>'; return; }
+  S.page = page; S.sel=null; FD=null; renderInspector(); renderFiles();
+  editFrame.srcdoc = buildDoc(page, true);
+}
+editFrame.addEventListener('load', () => {
+  FD = editFrame.contentDocument;
+  if(!FD || !FD.querySelector('[data-pt-editor]')){ FD=null; return; }
+  S.last = snap();
+  FD.addEventListener('mouseover', e => { if(S.mode!=='edit')return; clearHover(); const t=e.target; if(t.nodeType===1 && t!==FD.documentElement) t.setAttribute('data-pt-hover',''); }, true);
+  FD.addEventListener('mouseout', clearHover, true);
+  FD.addEventListener('click', e => {
+    const t = e.target.closest ? e.target : e.target.parentElement;
+    if(t && t.closest('[data-pt-ce]')) return;
+    e.preventDefault(); e.stopPropagation();
+    if(t) select(t === FD.documentElement ? FD.body : t);
+  }, true);
+  FD.addEventListener('dblclick', e => { e.preventDefault(); startTextEdit(e.target); }, true);
+  FD.addEventListener('submit', e => e.preventDefault(), true);
+  FD.addEventListener('keydown', onKey, true);
+  renderLayers(); renderCrumbs(); updateUndo();
+  if(S.mode==='preview') showPreview();
+});
+function clearHover(){ FD && $$('[data-pt-hover]', FD).forEach(n=>n.removeAttribute('data-pt-hover')); }
+function snap(){ return FD ? FD.documentElement.innerHTML.replace(/ data-pt-(hover|sel)=""/g,'') : ''; }
+function record(){
+  if(!FD) return;
+  const now = snap(); if(now===S.last) return;
+  S.undo.push(S.last); if(S.undo.length>80) S.undo.shift();
+  S.last = now; S.redo=[]; S.dirty=true; updateUndo(); renderLayers(); save();
+}
+function restore(html){
+  const path = S.sel ? pathOf(S.sel) : null;
+  FD.documentElement.innerHTML = html; S.last = html; S.dirty=true;
+  const el = path ? fromPath(path) : null; S.sel=null;
+  if(el) select(el); else { renderInspector(); renderCrumbs(); }
+  renderLayers(); updateUndo(); save();
+}
+function undo(){ if(!S.undo.length||!FD) return; finishTextEdit(); S.redo.push(S.last); restore(S.undo.pop()); }
+function redo(){ if(!S.redo.length||!FD) return; finishTextEdit(); S.undo.push(S.last); restore(S.redo.pop()); }
+function updateUndo(){ $('#undoBtn').disabled=!S.undo.length; $('#redoBtn').disabled=!S.redo.length; }
+function pathOf(el){ const p=[]; while(el && el.parentElement){ p.unshift([...el.parentElement.children].indexOf(el)); el=el.parentElement; } return p; }
+function fromPath(p){ let el=FD.documentElement; for(const i of p){ el=el && el.children[i]; } return el||null; }
+
+/* ---------- text editing on the page ---------- */
+const NO_TEXT = ['IMG','INPUT','BR','HR','VIDEO','AUDIO','IFRAME','SVG','SELECT','TEXTAREA','HTML','BODY','CANVAS','PICTURE','SOURCE'];
+function startTextEdit(el){
+  if(!el || el.nodeType!==1 || NO_TEXT.includes(el.tagName.toUpperCase())) return;
+  finishTextEdit(); select(el);
+  el.setAttribute('data-pt-ce',''); el.setAttribute('contenteditable','true'); el.focus();
+  hint('Typing — click outside or press Esc when done');
+  el.addEventListener('blur', finishTextEdit, {once:true});
+}
+function finishTextEdit(){
+  if(!FD) return; const el = FD.querySelector('[data-pt-ce]'); if(!el) return;
+  el.removeAttribute('data-pt-ce'); el.removeAttribute('contenteditable'); hint(null);
+  record(); if(S.sel===el) renderInspector();
+}
+function hint(t){ const h=$('#hint'); h.hidden=!t; if(t) h.textContent=t; }
+
+/* ---------- selection ---------- */
+function select(el){
+  if(!FD) return;
+  $$('[data-pt-sel]', FD).forEach(n=>n.removeAttribute('data-pt-sel'));
+  S.sel = el && el!==FD.documentElement ? el : null;
+  if(S.sel) S.sel.setAttribute('data-pt-sel','');
+  renderInspector(); renderCrumbs(); markLayer();
+}
+function label(el){
+  let s = el.tagName.toLowerCase();
+  if(el.id) s += '#'+el.id; else if(typeof el.className==='string' && el.className.trim()) s += '.'+el.className.trim().split(/\s+/)[0];
+  return s;
+}
+function renderCrumbs(){
+  const c=$('#crumbs'); c.textContent='';
+  if(!S.sel){ c.textContent='Click anything on the page to select it. Double-click text to type.'; return; }
+  const chain=[]; let el=S.sel; while(el && el!==FD.documentElement){ chain.unshift(el); el=el.parentElement; }
+  chain.forEach((n,i)=>{ if(i){ const s=document.createElement('span'); s.textContent='›'; c.append(s);} const b=document.createElement('button'); b.textContent=label(n); b.onclick=()=>select(n); c.append(b); });
+  c.scrollLeft = c.scrollWidth;
+}
+const SKIP_LAYER = ['SCRIPT','STYLE','BR','META','LINK','NOSCRIPT','TEMPLATE'];
+function renderLayers(){
+  const box=$('#layers'); box.textContent='';
+  if(!FD||!FD.body) return;
+  let count=0;
+  const walk=(el,depth)=>{
+    if(count>600) return;
+    for(const ch of el.children){
+      if(SKIP_LAYER.includes(ch.tagName)) continue; count++;
+      const b=document.createElement('button'); b.className='layer'; b.style.paddingLeft=(6+depth*12)+'px';
+      const t=document.createElement('span'); t.className='t'; t.textContent=label(ch);
+      const d=document.createElement('span'); d.className='d';
+      const txt=[...ch.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim();
+      d.textContent = txt ? txt.slice(0,28) : (ch.tagName==='IMG' ? (ch.getAttribute('alt')||'image') : '');
+      b.append(t,d); b._el=ch;
+      if(ch.style && ch.style.display==='none') b.classList.add('hid');
+      b.onclick=()=>{ select(ch); ch.scrollIntoView({block:'center', behavior:'smooth'}); };
+      box.append(b);
+      if(!['SVG','svg'].includes(ch.tagName)) walk(ch, depth+1);
+    }
+  };
+  const bb=document.createElement('button'); bb.className='layer'; bb.innerHTML='<span class="t">body</span>'; bb._el=FD.body; bb.onclick=()=>select(FD.body); box.append(bb);
+  walk(FD.body,1); markLayer();
+}
+function markLayer(){ $$('.layer').forEach(b=>{ const on=b._el===S.sel; b.setAttribute('aria-current', on); if(on) b.scrollIntoView({block:'nearest'}); }); }
+
+/* ---------- inspector ---------- */
+function computed(el){ return editFrame.contentWindow.getComputedStyle(el); }
+function renderInspector(){
+  const el=S.sel; $('#inspEmpty').hidden=!!el; $('#inspBody').hidden=!el; if(!el) return;
+  const tag=el.tagName.toLowerCase(); const cs=computed(el);
+  $('#elTag').textContent='<'+tag+'>';
+  $('#elDesc').textContent = ({h1:'Main heading',h2:'Heading',h3:'Subheading',h4:'Heading',p:'Paragraph',a:'Link',img:'Image',button:'Button',section:'Section',div:'Box',span:'Text',ul:'List',ol:'Numbered list',li:'List item',nav:'Navigation',header:'Header',footer:'Footer',body:'Whole page',input:'Input field',form:'Form',main:'Main area'})[tag]||'';
+  const isBody = el===FD.body;
+  $('#aParent').disabled=isBody; $('#aUp').disabled=isBody||!el.previousElementSibling; $('#aDown').disabled=isBody||!el.nextElementSibling; $('#aDup').disabled=isBody; $('#aDel').disabled=isBody;
+  const textOk = !NO_TEXT.includes(tag.toUpperCase()) && el.children.length===0;
+  $('#fText').hidden=!textOk; if(textOk) $('#iText').value=el.textContent;
+  $('#fLink').hidden=tag!=='a'; if(tag==='a'){ $('#iHref').value=el.getAttribute('href')||''; $('#iBlank').checked=el.getAttribute('target')==='_blank'; }
+  $('#fImg').hidden=tag!=='img'; if(tag==='img'){ $('#iSrc').value=el.getAttribute('data-pt-img')||(el.getAttribute('src')||'').slice(0,200); $('#iAlt').value=el.getAttribute('alt')||''; }
+  $('#fPh').hidden=!['input','textarea'].includes(tag); if(!$('#fPh').hidden) $('#iPh').value=el.getAttribute('placeholder')||'';
+  $('#iId').value=el.id; $('#iClass').value=(el.getAttribute('class')||'');
+  $$('[data-style]').forEach(inp=>{
+    const props=inp.dataset.style.split(','); const own=el.style.getPropertyValue(props[0]);
+    let v = own || cs.getPropertyValue(props[0]);
+    if(inp.dataset.unit) v = Math.round(parseFloat(v)||0);
+    else if(props[0].includes('color')) v = own || rgbToHex(cs.getPropertyValue(props[0])) || '';
+    else if(inp.tagName==='SELECT'){ v = own; if(props[0]==='font-weight' && !own) v=''; }
+    else if(!own && ['width','max-width','line-height'].includes(props[0])) v='';
+    inp.value=v;
+  });
+  $$('[data-color]').forEach(c=>{ c.value = rgbToHex(cs.getPropertyValue(c.dataset.color)) || '#ffffff'; });
+  $$('#alignSeg button').forEach(b=>b.setAttribute('aria-pressed', cs.textAlign===b.dataset.align || (b.dataset.align==='left' && cs.textAlign==='start')));
+  $('#iBw').value=Math.round(parseFloat(cs.borderTopWidth)||0); $('#iBc').value=rgbToHex(cs.borderTopColor)||'#000000';
+  const op=Math.round(parseFloat(cs.opacity)*100); $('#iOp').value=op; $('#opVal').textContent=op+'%';
+  $('#iHide').checked = el.style.display==='none';
+}
+function setStyle(props, val){
+  const el=S.sel; if(!el) return;
+  for(const p of props){ if(val===''||val==null) el.style.removeProperty(p); else el.style.setProperty(p, val); }
+}
+$$('[data-style]').forEach(inp=>{
+  const apply=()=>{ const props=inp.dataset.style.split(','); let v=inp.value.trim(); if(v!=='' && inp.dataset.unit) v+=inp.dataset.unit; setStyle(props,v);
+    if(props[0].includes('color')){ const c=$(`[data-color="${props[0]}"]`); if(c && /^#[0-9a-f]{6}$/i.test(v)) c.value=v; } };
+  inp.addEventListener('input', apply); inp.addEventListener('change', ()=>{ apply(); record(); });
+});
+$$('[data-color]').forEach(c=>{
+  c.addEventListener('input', ()=>{ setStyle([c.dataset.color], c.value); $(`[data-style="${c.dataset.color}"]`).value=c.value; });
+  c.addEventListener('change', record);
+});
+$$('#alignSeg button').forEach(b=>b.onclick=()=>{ setStyle(['text-align'], b.dataset.align); record(); renderInspector(); });
+const bord=()=>{ const w=$('#iBw').value; if(w===''||+w===0) setStyle(['border'],''); else setStyle(['border'], `${w}px solid ${$('#iBc').value}`); };
+$('#iBw').addEventListener('input',bord); $('#iBw').addEventListener('change',record);
+$('#iBc').addEventListener('input',()=>{ if(!+$('#iBw').value) $('#iBw').value=1; bord(); }); $('#iBc').addEventListener('change',record);
+$('#iOp').addEventListener('input',()=>{ const v=$('#iOp').value; $('#opVal').textContent=v+'%'; setStyle(['opacity'], v==100?'':String(v/100)); });
+$('#iOp').addEventListener('change',record);
+$('#iHide').addEventListener('change',()=>{ setStyle(['display'], $('#iHide').checked?'none':''); record(); });
+$('#aReset').onclick=()=>{ if(!S.sel) return; S.sel.removeAttribute('style'); record(); renderInspector(); toast('Style changes cleared'); };
+
+const attrInput=(id, fn)=>{ const i=$(id); i.addEventListener('input',()=>S.sel&&fn(S.sel,i)); i.addEventListener('change',record); };
+attrInput('#iText',(el,i)=>{ el.textContent=i.value; });
+attrInput('#iHref',(el,i)=>el.setAttribute('href',i.value));
+$('#iBlank').addEventListener('change',()=>{ const el=S.sel; if(!el)return; if($('#iBlank').checked){ el.setAttribute('target','_blank'); el.setAttribute('rel','noopener'); } else { el.removeAttribute('target'); } record(); });
+attrInput('#iAlt',(el,i)=>el.setAttribute('alt',i.value));
+attrInput('#iPh',(el,i)=>el.setAttribute('placeholder',i.value));
+attrInput('#iId',(el,i)=>{ i.value.trim()?el.id=i.value.trim():el.removeAttribute('id'); });
+attrInput('#iClass',(el,i)=>{ i.value.trim()?el.setAttribute('class',i.value):el.removeAttribute('class'); });
+$('#iSrc').addEventListener('change',()=>{ const el=S.sel; if(!el)return; const v=$('#iSrc').value.trim(); const p=resolveRef(v,S.page);
+  if(p && S.files[p].kind==='image'){ el.setAttribute('data-pt-img',v); el.src=S.files[p].data; } else { el.removeAttribute('data-pt-img'); el.setAttribute('src',v); } record(); });
+$('#iImgUp').onclick=()=>$('#imgInput').click();
+$('#imgInput').addEventListener('change', async ()=>{
+  const f=$('#imgInput').files[0]; $('#imgInput').value=''; if(!f||!S.sel) return;
+  const it=await readFile(f, f.name); let name='images/'+f.name.replace(/[^\w.\-]+/g,'-'); let n=1;
+  while(S.files[dirOf(S.page)+name] && S.files[dirOf(S.page)+name].data!==it.data){ name=`images/${n++}-`+f.name.replace(/[^\w.\-]+/g,'-'); }
+  S.files[dirOf(S.page)+name]={kind:'image', data:it.data};
+  S.sel.setAttribute('data-pt-img', name); S.sel.setAttribute('src', it.data); record(); renderFiles(); renderInspector(); toast('Image replaced');
+});
+
+/* ---------- element actions ---------- */
+$('#aParent').onclick=()=>{ if(S.sel && S.sel.parentElement && S.sel!==FD.body) select(S.sel.parentElement); };
+$('#aUp').onclick=()=>{ const el=S.sel, p=el&&el.previousElementSibling; if(p){ p.before(el); record(); renderInspector(); } };
+$('#aDown').onclick=()=>{ const el=S.sel, n=el&&el.nextElementSibling; if(n){ n.after(el); record(); renderInspector(); } };
+$('#aDup').onclick=()=>{ const el=S.sel; if(!el||el===FD.body) return; const c=el.cloneNode(true); c.removeAttribute('data-pt-sel'); if(c.id) c.id+='-copy'; el.after(c); record(); select(c); toast('Duplicated'); };
+$('#aDel').onclick=delSel;
+function delSel(){ const el=S.sel; if(!el||el===FD.body) return; const next=el.nextElementSibling||el.previousElementSibling||el.parentElement; el.remove(); record(); select(next===FD.documentElement?FD.body:next); toast('Deleted — Ctrl+Z to undo'); }
+
+const PH_IMG = 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="340"><rect width="100%" height="100%" fill="#dde3ea"/><text x="50%" y="50%" font-family="sans-serif" font-size="22" fill="#6b7682" text-anchor="middle" dominant-baseline="middle">Replace this image</text></svg>');
+const TEMPLATES = {
+  h2:'<h2>New heading</h2>', p:'<p>Write your text here.</p>', button:'<button type="button">Click me</button>',
+  a:'<a href="#">New link</a>', img:`<img src="${PH_IMG}" alt="" style="max-width: 100%; height: auto;">`,
+  ul:'<ul><li>First item</li><li>Second item</li><li>Third item</li></ul>',
+  section:'<section style="padding: 48px 24px;"><h2>New section</h2><p>Describe this section.</p></section>', hr:'<hr>'
+};
+$$('#palette [data-add]').forEach(b=>b.onclick=()=>{
+  if(!FD){ toast('Upload a page first'); return; }
+  const t=FD.createElement('template'); t.innerHTML=TEMPLATES[b.dataset.add]; const node=t.content.firstElementChild;
+  const s=S.sel;
+  if(!s || s===FD.body) FD.body.append(node); else if(s.tagName==='LI' && node.tagName==='LI') s.after(node); else s.after(node);
+  record(); select(node); node.scrollIntoView({block:'center',behavior:'smooth'});
+  if(node.tagName==='IMG') toast('Image added — use “Replace image” on the right');
+});
+
+/* ---------- keyboard ---------- */
+function onKey(e){
+  const inField = (e.target.closest && e.target.closest('input,textarea,select,[contenteditable="true"]'));
+  const mod = e.ctrlKey||e.metaKey;
+  if(e.key==='Escape'){ if(FD && FD.querySelector('[data-pt-ce]')){ FD.querySelector('[data-pt-ce]').blur(); } else if(!$('#codeModal').hidden) closeCode(); else select(null); return; }
+  if(mod && e.key.toLowerCase()==='z' && !inField){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
+  if(mod && e.key.toLowerCase()==='y' && !inField){ e.preventDefault(); redo(); return; }
+  if((e.key==='Delete'||e.key==='Backspace') && !inField && S.sel && S.mode==='edit'){ e.preventDefault(); delSel(); }
+  if(e.key==='Enter' && !inField && S.sel && S.mode==='edit'){ e.preventDefault(); startTextEdit(S.sel); }
+}
+document.addEventListener('keydown', onKey);
+$('#undoBtn').onclick=undo; $('#redoBtn').onclick=redo;
+
+/* ---------- modes & devices ---------- */
+function showPreview(){ previewFrame.srcdoc = FD ? exportDoc('single') : buildDoc(S.page,false); }
+function setMode(m){
+  finishTextEdit(); S.mode=m;
+  $('#modeEdit').setAttribute('aria-pressed', m==='edit'); $('#modePreview').setAttribute('aria-pressed', m==='preview');
+  editFrame.hidden = m!=='edit'; previewFrame.hidden = m!=='preview';
+  if(m==='preview'){ showPreview(); hint('Preview: your JavaScript is running. Switch to Edit to change things.'); setTimeout(()=>hint(null),2600); }
+  else hint(null);
+}
+$('#modeEdit').onclick=()=>setMode('edit'); $('#modePreview').onclick=()=>setMode('preview');
+$$('[data-w]').forEach(b=>b.onclick=()=>{ $$('[data-w]').forEach(x=>x.setAttribute('aria-pressed', x===b)); $('#frameWrap').style.width = b.dataset.w==='100%'?'100%':`min(${b.dataset.w}, 100%)`; });
+
+/* ---------- file list ---------- */
+function renderFiles(){
+  const box=$('#files'); box.textContent='';
+  const keys=Object.keys(S.files).sort((a,b)=>{ const o={html:0,css:1,js:2,image:3,text:4,other:5}; return (o[S.files[a].kind]-o[S.files[b].kind])||a.localeCompare(b); });
+  $('#fileCount').textContent = keys.length ? keys.length : '';
+  for(const k of keys){
+    const f=S.files[k]; const b=document.createElement('button'); b.className='file';
+    const t=document.createElement('span'); t.className='tag'; t.textContent=f.kind==='image'?'img':f.kind==='other'?'file':ext(k);
+    const n=document.createElement('span'); n.className='nm'; n.textContent=k; n.title=k;
+    b.append(t,n);
+    if(f.kind==='html'){ b.setAttribute('aria-current', k===S.page); b.title='Edit this page'; b.onclick=()=>{ if(k===S.page)return; commit(); S.undo=[]; S.redo=[]; openPage(k); save(); }; }
+    else { b.onclick=()=>openCode(k); b.title='View code'; }
+    box.append(b);
+  }
+  $('#sampleBanner').hidden=!S.sample;
+}
+$('#pickFiles').onclick=$('#uploadTop').onclick=()=>$('#fileInput').click();
+$('#pickFolder').onclick=()=>$('#folderInput').click();
+$('#fileInput').addEventListener('change',e=>{ const f=[...e.target.files]; e.target.value=''; if(f.length) ingest(f,false); });
+$('#folderInput').addEventListener('change',e=>{ const f=[...e.target.files]; e.target.value=''; if(f.length) ingest(f,true); });
+$('#loadSample').onclick=()=>{ loadSample(); toast('Sample loaded'); };
+$('#clearAll').onclick=()=>{ S.files={'index.html':{kind:'html',data:starterHtml()}}; S.sample=false; S.undo=[]; S.redo=[]; S.dirty=false; S.page='index.html'; renderFiles(); openPage(S.page); save(); };
+const app=$('#app');
+['dragenter','dragover'].forEach(ev=>app.addEventListener(ev,e=>{ if(e.dataTransfer && [...e.dataTransfer.types].includes('Files')){ e.preventDefault(); app.classList.add('dragover'); } }));
+['dragleave','drop'].forEach(ev=>app.addEventListener(ev,e=>{ if(ev==='dragleave' && e.relatedTarget && app.contains(e.relatedTarget)) return; app.classList.remove('dragover'); }));
+app.addEventListener('drop', async e=>{
+  e.preventDefault(); const items=[...(e.dataTransfer.items||[])];
+  const entries=items.map(i=>i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+  if(entries.some(en=>en.isDirectory)){
+    const files=[]; const walk=(en,path)=>new Promise(res=>{
+      if(en.isFile) en.file(f=>{ Object.defineProperty(f,'webkitRelativePath',{value:path+f.name}); files.push(f); res(); },()=>res());
+      else { const r=en.createReader(); const all=[]; const read=()=>r.readEntries(async ents=>{ if(!ents.length){ for(const c of all) await walk(c,path+en.name+'/'); res(); } else { all.push(...ents); read(); } },()=>res()); read(); }
+    });
+    for(const en of entries) await walk(en,'');
+    ingest(files,true);
+  } else ingest([...e.dataTransfer.files],false);
+});
+
+/* ---------- code output ---------- */
+let codeOut=[], codeTab=0;
+function buildOutputs(){
+  commit();
+  return Object.keys(S.files).filter(k=>S.files[k].kind!=='image'&&S.files[k].kind!=='other').sort((a,b)=>{ const o={html:0,css:1,js:2,text:3}; return (o[S.files[a].kind]-o[S.files[b].kind])||a.localeCompare(b); }).map(k=>({name:k, text:S.files[k].data}));
+}
+function openCode(focus){
+  if(!Object.keys(S.files).length){ toast('Upload files first'); return; }
+  codeOut=buildOutputs(); codeTab=Math.max(0, codeOut.findIndex(o=>o.name===(focus||S.page)));
+  const imgs=Object.values(S.files).filter(f=>f.kind==='image'||f.kind==='other').length;
+  $('#codeNote').textContent = `${codeOut.length} code file${codeOut.length!==1?'s':''}${imgs?` + ${imgs} image/asset file${imgs!==1?'s':''} (in the .zip)`:''}`;
+  renderTabs(); $('#codeModal').hidden=false; $('#closeCode').focus();
+}
+function renderTabs(){
+  const t=$('#codeTabs'); t.textContent='';
+  codeOut.forEach((o,i)=>{ const b=document.createElement('button'); b.setAttribute('role','tab'); b.setAttribute('aria-selected', i===codeTab); b.textContent=o.name; b.onclick=()=>{ codeTab=i; renderTabs(); }; t.append(b); });
+  $('#codePre').textContent = codeOut[codeTab] ? codeOut[codeTab].text : '';
+}
+function closeCode(){ $('#codeModal').hidden=true; }
+$('#getCode').onclick=()=>openCode(); $('#closeCode').onclick=closeCode;
+$('#codeModal').addEventListener('click',e=>{ if(e.target.id==='codeModal') closeCode(); });
+$('#copyCode').onclick=()=>{
+  const txt=$('#codePre').textContent;
+  const fallback=()=>{ const r=document.createRange(); r.selectNodeContents($('#codePre')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast('Selected — press Ctrl+C to copy'); };
+  try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied '+codeOut[codeTab].name), fallback); }catch(e){ fallback(); }
+};
+function saveFile(filename, data){
+  try{ const url=URL.createObjectURL(data instanceof Blob?data:new Blob([data])); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); toast('Downloading '+filename); }
+  catch(e){ toast('Download didn’t start. Use “Copy this file” instead.'); }
+}
+$('#dlSingle').onclick=()=>{ const html=exportDoc('single'); const base=(S.page||'page.html').split('/').pop().replace(/\.html?$/i,''); saveFile(base+'-complete.html', html); };
+$('#dlZip').onclick=async()=>{
+  if(!window.JSZip){ toast('Zip could not load. Copy each file instead.'); return; }
+  commit(); const zip=new JSZip();
+  for(const [k,f] of Object.entries(S.files)){
+    if(f.kind==='image'||f.kind==='other'){ const b64=f.data.split(',')[1]||''; zip.file(k, b64, {base64:true}); }
+    else zip.file(k, f.data);
+  }
+  const blob=await zip.generateAsync({type:'blob'}); saveFile('my-website.zip', blob);
+};
+
+/* ---------- sample project ---------- */
+function loadSample(){
+  S.files = {
+'index.html':{kind:'html',data:`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Harbor Street Bakery</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <strong class="logo">Harbor Street Bakery</strong>
+    <nav><a href="#menu">Menu</a><a href="#visit">Visit</a></nav>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">Baked before sunrise, every day</p>
+    <h1>Sourdough, croissants and cardamom buns</h1>
+    <p>Small-batch bread from a 48-hour starter. Order by 6&nbsp;pm for next-morning pickup.</p>
+    <button id="orderBtn" class="cta">Reserve a loaf</button>
+    <p id="orderMsg" class="msg" hidden>Thanks! Your loaf is set aside until 11:00.</p>
+  </section>
+
+  <section id="menu" class="menu">
+    <h2>Today's shelf</h2>
+    <div class="cards">
+      <article class="card"><h3>Country sourdough</h3><p>Stone-ground wheat and rye, dark crust.</p><span class="price">$9.50</span></article>
+      <article class="card"><h3>Butter croissant</h3><p>27 layers, cultured French-style butter.</p><span class="price">$4.25</span></article>
+      <article class="card"><h3>Cardamom bun</h3><p>Swedish-style knot with pearl sugar.</p><span class="price">$4.75</span></article>
+    </div>
+  </section>
+
+  <footer id="visit" class="foot">
+    <p>214 Harbor Street · Open Tue–Sun, 7:00–14:00</p>
+  </footer>
+  <script src="script.js"><\/script>
+</body>
+</html>
+`},
+'style.css':{kind:'css',data:`* { box-sizing: border-box; }
+body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #2b211a; background: #fbf6ef; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 18px 32px; border-bottom: 1px solid #e8dccb; }
+.nav a { margin-left: 20px; color: #2b211a; text-decoration: none; font-family: Arial, sans-serif; font-size: 14px; }
+.logo { font-size: 18px; }
+.hero { padding: 72px 32px; max-width: 760px; }
+.eyebrow { font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .12em; font-size: 12px; color: #9a5b2e; }
+.hero h1 { font-size: 44px; line-height: 1.1; margin: 8px 0 16px; }
+.cta { background: #9a5b2e; color: #fff; border: 0; padding: 12px 22px; border-radius: 6px; font-size: 16px; cursor: pointer; }
+.msg { color: #2f6b3a; font-family: Arial, sans-serif; }
+.menu { padding: 40px 32px 64px; background: #fff; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.card { border: 1px solid #eadfce; border-radius: 10px; padding: 20px; }
+.card h3 { margin: 0 0 6px; }
+.price { font-family: Arial, sans-serif; font-weight: bold; color: #9a5b2e; }
+.foot { padding: 24px 32px; font-family: Arial, sans-serif; font-size: 14px; color: #6d5c4d; }
+`},
+'script.js':{kind:'js',data:`// Shows a confirmation when the button is clicked
+document.getElementById('orderBtn').addEventListener('click', function () {
+  document.getElementById('orderMsg').hidden = false;
+  this.textContent = 'Reserved ✓';
+});
+`}
+  };
+  S.page='index.html'; S.sample=true; S.undo=[]; S.redo=[]; S.dirty=false;
+  renderFiles(); openPage(S.page);
+}
+
+/* ---------- start ---------- */
+if(loadSaved()){ if(!S.files[S.page]) S.page=htmlPages()[0]; renderFiles(); openPage(S.page); } else loadSample();
+updateUndo();
+})();
+</script>
+
+</body>
+</html>
