@@ -4,6 +4,9 @@
 (() => {
 const WA_ID = "pixelandbrush1";
 const EMAIL = "sm@pixelandbrush.com";
+const CC = "marufi.saad@gmail.com";           // also gets every plan
+const FORM_URL = "https://formsubmit.co/ajax/" + EMAIL; // free email service: formsubmit.co
+const PAGE_URL = "https://pixelandbrush.com/website-planner.html";
 const STORE = "pb-website-plan-v1";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -104,6 +107,11 @@ function data(){
     notes: get("notes"), cName: get("cName"), cReach: get("cReach")
   };
 }
+function mix(a, b, amt){ // blend colour a into b (amt = share of a)
+  const p = h => [1,3,5].map(i => parseInt(h.slice(i,i+2),16));
+  const A = p(a), B = p(b);
+  return "#" + A.map((v,i) => Math.round(v*amt + B[i]*(1-amt)).toString(16).padStart(2,"0")).join("");
+}
 function shade(hex){ // a lighter companion colour for "my own colour"
   const n = parseInt(hex.slice(1),16); const mix = c => Math.round(c + (255-c)*.55);
   return "#" + [n>>16, (n>>8)&255, n&255].map(c => mix(c).toString(16).padStart(2,"0")).join("");
@@ -120,7 +128,7 @@ function renderPreview(){
   site.className = "site st-" + d.style.toLowerCase();
   site.style.setProperty("--c1", d.colors[0]);
   site.style.setProperty("--c2", d.colors[1]);
-  site.style.setProperty("--hero", d.style === "Bold" ? "#16161c" : `color-mix(in srgb, ${d.colors[0]} 10%, var(--bg))`);
+  site.style.setProperty("--hero", d.style === "Bold" ? "#16161c" : mix(d.colors[0], d.style === "Elegant" ? "#fbf8f3" : "#ffffff", .1));
   $("#pvUrl").textContent = (d.name ? d.name.toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]+/g,"") : "yourbusiness") + ".ca";
   const has = s => d.sections.includes(s);
   const menu = SECTIONS.filter(s => has(s.v)).slice(0,4).map(s => `<span>${NAMES[s.v]}</span>`).join("");
@@ -207,11 +215,23 @@ function rows(d){
 function renderSummary(){
   $("#summary").innerHTML = rows(data()).map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
 }
+function planState(withContact){
+  const fd = new FormData(form); const o = {};
+  for(const [k,v] of fd){ if(!withContact && (k === "cName" || k === "cReach")) continue; (o[k] = o[k] || []).push(v); }
+  o.ownColor = [$("#ownColor").value];
+  return o;
+}
+function designLink(){ // a link that reopens this exact design on our site
+  const json = JSON.stringify(planState(false));
+  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(json))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  return PAGE_URL + "#plan=" + b64;
+}
 function message(d, bold){
   const b = t => bold ? `*${t}:*` : `${t}:`;
   return `Hi Pixel and Brush! I made a website plan on your website.\n\n`
     + rows(d).map(([k,v]) => `${b(k)} ${v}`).join("\n")
-    + `\n\n${b("My name")} ${d.cName}\n${b("Reach me at")} ${d.cReach}`;
+    + `\n\n${b("My name")} ${d.cName}\n${b("Reach me at")} ${d.cReach}`
+    + `\n\n${b("See my design")} ${designLink()}`;
 }
 function ready(){
   const d = data();
@@ -220,24 +240,55 @@ function ready(){
   if(!d.cReach){ $("#plErr").textContent = "Please add a phone number or email so we can reply."; $("#cReach").focus(); return null; }
   $("#plErr").textContent = ""; return d;
 }
-function openLink(href, newTab){
-  const a = document.createElement("a"); a.href = href; if(newTab){ a.target = "_blank"; a.rel = "noopener"; }
-  document.body.appendChild(a); a.click(); a.remove();
+
+/* picture of the customer's preview (whole page, not just the visible part) */
+async function snapshot(){
+  if(!window.html2canvas) return null;
+  try{
+    const canvas = await html2canvas($("#browser"), {
+      scale: 1, backgroundColor: "#ffffff", logging: false, useCORS: true,
+      onclone: doc => {
+        const s = doc.getElementById("site"); s.style.height = "auto"; s.style.overflow = "visible";
+        const w = doc.querySelector(".s-wa"); if(w) w.remove();
+      }
+    });
+    return await new Promise(r => canvas.toBlob(r, "image/jpeg", 0.85));
+  }catch(e){ return null; }
 }
-function sent(how){
+async function emailPlan(d, image){
+  const fd = new FormData();
+  fd.append("_subject", `New website plan: ${d.name}`);
+  fd.append("_cc", CC);
+  fd.append("_captcha", "false");
+  fd.append("_template", "table");
+  if(/@/.test(d.cReach)) fd.append("_replyto", d.cReach);
+  fd.append("Customer name", d.cName);
+  fd.append("Phone or email", d.cReach);
+  for(const [k,v] of rows(d)) fd.append(k, v);
+  fd.append("See their design", designLink());
+  if(image) fd.append("attachment", image, "website-plan-" + d.name.toLowerCase().replace(/[^a-z0-9]+/g,"-") + ".jpg");
+  const res = await fetch(FORM_URL, {method:"POST", body:fd, headers:{Accept:"application/json"}});
+  const j = await res.json().catch(() => ({}));
+  return res.ok && String(j.success) === "true";
+}
+$("#sendPlan").addEventListener("click", async () => {
+  const d = ready(); if(!d) return;
+  const btn = $("#sendPlan"); const label = btn.innerHTML;
+  btn.disabled = true; btn.textContent = "Sending your plan…";
+  let ok = false;
+  try{
+    const image = await snapshot();
+    ok = await emailPlan(d, image).catch(() => false);
+    if(!ok && image) ok = await emailPlan(d, null).catch(() => false); // try again without the picture
+  }catch(e){ ok = false; }
+  btn.disabled = false; btn.innerHTML = label;
+  $("#waLink").href = `https://wa.me/${WA_ID}?text=${encodeURIComponent(message(d, true))}`;
+  $("#doneTitle").textContent = ok ? "Plan sent! One more tap." : "Almost there: send it on WhatsApp";
+  $("#doneHow").textContent = ok
+    ? "We've received your plan and a picture of your design by email. Send a copy on WhatsApp too, so we can reply faster."
+    : `We couldn't send it automatically just now. Tap below to send it on WhatsApp, or email ${EMAIL}.`;
   $("#doneBox").hidden = false;
-  $("#doneHow").textContent = how;
   $("#doneBox").scrollIntoView({behavior:"smooth", block:"nearest"});
-}
-$("#sendWa").addEventListener("click", () => {
-  const d = ready(); if(!d) return;
-  openLink(`https://wa.me/${WA_ID}?text=${encodeURIComponent(message(d, true))}`, true);
-  sent("WhatsApp should open with your plan already typed. Just press send.");
-});
-$("#sendMail").addEventListener("click", () => {
-  const d = ready(); if(!d) return;
-  openLink(`mailto:${EMAIL}?subject=${encodeURIComponent("Website plan – " + d.name)}&body=${encodeURIComponent(message(d, false))}`);
-  sent(`Your email app should open with your plan ready to send to ${EMAIL}.`);
 });
 $("#copyPlan").addEventListener("click", () => {
   const d = data(); const txt = message(d, false); const btn = $("#copyPlan"); const label = btn.textContent;
@@ -247,7 +298,9 @@ $("#copyPlan").addEventListener("click", () => {
 });
 
 /* ---------- save progress in this browser ---------- */
+let viewing = false; // true when opened from a "See their design" link
 function save(){
+  if(viewing) return;
   try{
     const fd = new FormData(form); const o = {};
     for(const [k,v] of fd) (o[k] = o[k] || []).push(v);
@@ -256,15 +309,25 @@ function save(){
     $("#saved").textContent = "Progress saved";
   }catch(e){}
 }
+function fromLink(){
+  const m = /[#&]plan=([A-Za-z0-9_-]+)/.exec(location.hash); if(!m) return null;
+  try{
+    const b = atob(m[1].replace(/-/g,"+").replace(/_/g,"/"));
+    return JSON.parse(new TextDecoder().decode(Uint8Array.from(b, c => c.charCodeAt(0))));
+  }catch(e){ return null; }
+}
 function restore(){
   try{
-    const o = JSON.parse(localStorage.getItem(STORE) || "null"); if(!o) return;
+    let o = fromLink();
+    if(o){ viewing = true; o._step = 4; $("#viewBanner").hidden = false; }
+    else o = JSON.parse(localStorage.getItem(STORE) || "null");
+    if(!o) return;
     form.querySelectorAll("input[type=checkbox]").forEach(i => i.checked = (o[i.name]||[]).includes(i.value));
     form.querySelectorAll("input[type=radio]").forEach(i => { if(o[i.name]) i.checked = o[i.name].includes(i.value); });
     form.querySelectorAll("input:not([type=checkbox]):not([type=radio]),textarea").forEach(i => { if(o[i.name] && o[i.name][0] != null) i.value = o[i.name][0]; });
     if(o.ownColor) $("#ownColor").value = o.ownColor[0];
     reached = Math.min(o._step || 0, steps.length-1);
-    $("#saved").textContent = "Welcome back – your plan was saved";
+    if(!viewing) $("#saved").textContent = "Welcome back – your plan was saved";
   }catch(e){}
 }
 $("#ownColor").addEventListener("input", () => {
@@ -273,6 +336,7 @@ $("#ownColor").addEventListener("input", () => {
 });
 $("#restart").addEventListener("click", () => {
   try{ localStorage.removeItem(STORE); }catch(e){}
+  if(viewing){ viewing = false; $("#viewBanner").hidden = true; history.replaceState(null, "", location.pathname); }
   form.reset(); $("#doneBox").hidden = true; reached = 0; $("#saved").textContent = ""; $("#ownDot").style.background = $("#ownColor").value;
   renderPreview(); show(0);
 });
