@@ -1,9 +1,9 @@
 /* Pixel and Brush – shared site script */
 const PHONE = "+16135193706";               // Call now
 const PHONE_DISPLAY = "(613) 519-3706";
-const WHATSAPP_NUMBER = "14378087223";       // digits only, with country code
+const WHATSAPP_ID = "pixelandbrush1";      // WhatsApp username (no @). A phone number with country code also works here.
 const HANDLE = "@pixelandbrush1";
-const waURL = t => "https://wa.me/" + WHATSAPP_NUMBER + (t ? "?text=" + encodeURIComponent(t) : "");
+const waURL = t => "https://wa.me/" + WHATSAPP_ID + (t ? "?text=" + encodeURIComponent(t) : "");
 const $ = s => document.querySelector(s);
 
 const yr = $("#yr"); if (yr) yr.textContent = new Date().getFullYear();
