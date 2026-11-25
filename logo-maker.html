@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Free Logo Maker | Pixel and Brush</title>
+<meta name="description" content="Sketch your logo idea for free with a brush, lines, circles, triangles, squares, text and any colour. Download it as a PNG or send it to Pixel and Brush to turn into a professional logo.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://pixelandbrush.com/logo-maker.html">
+<meta name="theme-color" content="#07081a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pixel and Brush">
+<meta property="og:title" content="Free Logo Maker | Pixel and Brush">
+<meta property="og:description" content="Sketch your logo idea for free, then download it or send it to Pixel and Brush.">
+<meta property="og:url" content="https://pixelandbrush.com/logo-maker.html">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Pacifico&family=Bebas+Neue&display=swap">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Pixel and Brush Logo Maker","url":"https://pixelandbrush.com/logo-maker.html","applicationCategory":"DesignApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"CAD"},"provider":{"@id":"https://pixelandbrush.com/#business"}}</script>
+<style>
+/* Layout: drawing studio — tool rail left, square artboard centre, colour & settings panel right; stacks on phones */
+:root{
+  --bg:#07081a; --panel:#0d0f2a; --panel-2:#15183a; --line:#262a52; --fg:#eef0ff; --muted:#a5a9cf;
+  --accent:#7b3fe4; --accent-soft:#251c52; --danger:#ff7a9c; --ok:#25d366;
+  --grad:linear-gradient(120deg,#2f6bff 0%,#7b3fe4 50%,#e0338f 100%);
+  --font-ui:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-display:"Sora","Inter",system-ui,sans-serif;
+  --r:10px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:13px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid #e0338f;outline-offset:2px}
+
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(0,1fr);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;margin-right:6px}
+.brand a{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none;font-family:var(--font-display)}
+.brand small{font-weight:600;color:var(--muted);font-size:12px;border-left:1px solid var(--line);padding-left:8px}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel-2);border-radius:var(--r);padding:7px 12px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;text-decoration:none;color:var(--fg)}
+.btn:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed;border-color:var(--line)}
+.btn.primary{background:var(--grad);border-color:transparent;color:#fff}
+.btn.wa{background:var(--ok);border-color:transparent;color:#04210f}
+.btn svg{width:16px;height:16px}
+.toplink{color:var(--muted);text-decoration:none;font-weight:600;padding:6px 8px;border-radius:var(--r)}
+.toplink:hover{color:var(--fg);background:var(--panel-2)}
+
+.work{display:grid;grid-template-columns:76px minmax(0,1fr) 280px;min-height:0}
+.rail{background:var(--panel);border-right:1px solid var(--line);padding:10px 8px;display:flex;flex-direction:column;gap:6px;overflow:auto}
+.tool{width:60px;border:1px solid transparent;background:transparent;border-radius:12px;padding:8px 4px 6px;cursor:pointer;display:grid;justify-items:center;gap:4px;color:var(--muted);font-size:11px;font-weight:600}
+.tool svg{width:24px;height:24px}
+.tool:hover{background:var(--panel-2);color:var(--fg)}
+.tool[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--fg)}
+.rail hr{width:100%;border:0;border-top:1px solid var(--line);margin:4px 0}
+
+.stage{display:grid;place-items:center;padding:20px;min-height:0;min-width:0;overflow:auto;background:radial-gradient(circle at 50% 30%,#14173d,var(--bg) 70%)}
+.board{position:relative;width:min(100%,calc(100vh - 140px),760px);aspect-ratio:1;border-radius:6px;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);touch-action:none;
+  --chk:#d9dbe6; background-color:#fff}
+.board.transparent{background-image:linear-gradient(45deg,var(--chk) 25%,transparent 25%),linear-gradient(-45deg,var(--chk) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--chk) 75%),linear-gradient(-45deg,transparent 75%,var(--chk) 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}
+.board canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:6px}
+#guide{pointer-events:none;opacity:0;transition:opacity .2s}
+.board.guides #guide{opacity:1}
+#live{cursor:crosshair}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#8a8fb3;font-size:15px;font-weight:600;text-align:center;pointer-events:none;line-height:1.5}
+.hint b{display:block;font-family:var(--font-display);font-size:20px;color:#4b4f78}
+
+.side{background:var(--panel);border-left:1px solid var(--line);overflow:auto;min-height:0}
+.sec{padding:14px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.sec h3{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.current{display:flex;align-items:center;gap:10px}
+.current input[type=color]{width:52px;height:52px;border:1px solid var(--line);border-radius:12px;padding:3px;background:var(--panel-2);cursor:pointer;flex:none}
+.current .hex{flex:1;min-width:0;border:1px solid var(--line);background:var(--panel-2);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Menlo,monospace;text-transform:uppercase}
+.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.sw{aspect-ratio:1;border-radius:8px;border:1px solid rgba(255,255,255,.18);cursor:pointer;padding:0;position:relative}
+.sw[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+.sw.clear{background:linear-gradient(45deg,transparent 45%,#ff5c7a 45% 55%,transparent 55%),#fff}
+.label{font-size:11px;color:var(--muted);font-weight:600}
+.row{display:flex;align-items:center;gap:10px}
+.row input[type=range]{flex:1;min-width:0;accent-color:var(--accent)}
+.val{min-width:42px;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel-2)}
+.seg button{flex:1;border:0;background:transparent;padding:7px 6px;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.inp{width:100%;border:1px solid var(--line);background:var(--panel-2);border-radius:8px;padding:8px 10px;min-width:0}
+.check{display:flex;align-items:center;gap:8px;cursor:pointer}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.modal-bg{position:fixed;inset:0;background:rgba(5,6,20,.6);display:grid;place-items:center;z-index:50;padding:16px}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;width:min(460px,100%);padding:22px;display:grid;gap:14px;max-height:100%;overflow:auto}
+.modal h2{margin:0;font-family:var(--font-display);font-size:20px}
+.modal p{margin:0;color:var(--muted);line-height:1.5}
+.modal img{width:120px;height:120px;border-radius:10px;background:#fff;object-fit:contain;justify-self:center}
+.modal .acts{grid-template-columns:1fr}
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:600;z-index:60}
+
+@media (max-width:900px){
+  .app{height:auto;min-height:100%}
+  .work{grid-template-columns:minmax(0,1fr)}
+  .rail{flex-direction:row;flex-wrap:wrap;justify-content:center;border-right:0;border-bottom:1px solid var(--line);padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+  .rail hr{display:none}
+  .tool{width:auto;min-width:54px}
+  .stage{padding:14px max(16px,env(safe-area-inset-left,0px))}
+  .board{width:100%}
+  .side{border-left:0;border-top:1px solid var(--line)}
+  .brand small{display:none}
+  .top{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+}
+@media (prefers-reduced-motion:reduce){#guide{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><a href="index.html" aria-label="Pixel and Brush home"><svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/><rect x="9" y="12" width="7" height="7" rx="1.8" fill="#2f6bff"/><rect x="18" y="12" width="7" height="7" rx="1.8" fill="#3d63f5"/><rect x="9" y="21" width="7" height="7" rx="1.8" fill="#4a5bef"/><rect x="18" y="21" width="7" height="7" rx="1.8" fill="#2f6bff" opacity=".35"/><path d="M37.5 10.5c1.2 1 1 2.6-.2 3.8L27 26.5l-3-2.6 11.3-12.9c.6-.7 1.5-1 2.2-.5Z" fill="#7b3fe4"/><path d="M23.2 24.6l3 2.7c-.6 3.4-3 6.6-7.6 7.7-1.6.4-3.3.3-4.6-.3 2.6-1 3.6-2.6 4.6-4.9 1-2.4 2.5-4.4 4.6-5.2Z" fill="#e0338f"/></svg>PIXEL &amp; BRUSH</a><small>Logo Maker</small></div>
+    <button class="btn" id="undoBtn" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+    <button class="btn" id="redoBtn" title="Redo (Ctrl+Shift+Z)" disabled>↷ Redo</button>
+    <span class="grow"></span>
+    <a class="toplink" href="https://wa.me/pixelandbrush1" target="_blank" rel="noopener">Need help?</a>
+    <button class="btn" id="dlBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Download PNG</button>
+    <button class="btn primary" id="sendBtn">Send to Pixel &amp; Brush</button>
+  </div>
+
+  <div class="work">
+    <nav class="rail" aria-label="Drawing tools">
+      <button class="tool" data-tool="brush" aria-pressed="true" title="Brush (B)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9 12.5c-2.5 0-4 1.8-4 4 0 1.6-.8 2.6-2 3 4.5 1.5 9-.5 9-4.5z"/></svg>Brush</button>
+      <button class="tool" data-tool="line" aria-pressed="false" title="Line (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20 20 4"/></svg>Line</button>
+      <button class="tool" data-tool="eraser" aria-pressed="false" title="Eraser (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4L13.3 4.7a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21z"/><path d="M22 21H7M5.5 12.5l6 6"/></svg>Eraser</button>
+      <hr>
+      <button class="tool" data-tool="circle" aria-pressed="false" title="Circle (C) — hold Shift for a perfect circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/></svg>Circle</button>
+      <button class="tool" data-tool="triangle" aria-pressed="false" title="Triangle (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5 21 20H3z"/></svg>Triangle</button>
+      <button class="tool" data-tool="square" aria-pressed="false" title="Square (S) — hold Shift for a perfect square"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="1.5"/></svg>Square</button>
+      <hr>
+      <button class="tool" data-tool="text" aria-pressed="false" title="Text (X)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>Text</button>
+      <button class="tool" data-tool="fill" aria-pressed="false" title="Paint bucket (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M5 2l5 5M2 13h15M22 20a2 2 0 1 1-4 0c0-1.6 2-4 2-4s2 2.4 2 4z"/></svg>Fill</button>
+    </nav>
+
+    <main class="stage">
+      <div class="board transparent" id="board">
+        <canvas id="art" width="1000" height="1000" aria-label="Your logo drawing"></canvas>
+        <canvas id="guide" width="1000" height="1000" aria-hidden="true"></canvas>
+        <canvas id="live" width="1000" height="1000" aria-hidden="true"></canvas>
+        <div class="hint" id="hint"><b>Sketch your logo here</b>Pick a tool and start drawing.<br>On a computer, hold Shift for perfect circles and squares.</div>
+      </div>
+    </main>
+
+    <aside class="side">
+      <div class="sec">
+        <h3>Colour</h3>
+        <div class="current">
+          <input type="color" id="color" value="#7b3fe4" aria-label="Pick any colour">
+          <input class="hex" id="hex" value="#7B3FE4" maxlength="7" aria-label="Colour code" spellcheck="false">
+        </div>
+        <div class="swatches" id="swatches"></div>
+        <span class="label">Recently used</span>
+        <div class="swatches" id="recent"></div>
+        <div>
+          <span class="label">See-through</span>
+          <div class="row"><input type="range" id="alpha" min="10" max="100" value="100" aria-label="Opacity"><span class="val" id="alphaVal">100%</span></div>
+        </div>
+      </div>
+      <div class="sec">
+        <h3>Size</h3>
+        <div class="row"><input type="range" id="size" min="1" max="120" value="14" aria-label="Brush and line size"><span class="val" id="sizeVal">14 px</span></div>
+        <div id="shapeOpts">
+          <span class="label">Shapes are</span>
+          <div class="seg" id="fillSeg"><button data-fill="outline" aria-pressed="false">Outline</button><button data-fill="filled" aria-pressed="true">Filled</button></div>
+        </div>
+        <div id="textOpts" hidden>
+          <label class="label" for="textVal">Text to place</label>
+          <input class="inp" id="textVal" value="Your Brand" maxlength="40">
+          <label class="label" for="font">Font</label>
+          <select class="inp" id="font">
+            <option value="800 {s}px Sora, sans-serif">Modern (Sora)</option>
+            <option value="700 {s}px Inter, sans-serif">Clean (Inter)</option>
+            <option value="700 {s}px 'Playfair Display', Georgia, serif">Elegant (Playfair)</option>
+            <option value="italic 700 {s}px 'Playfair Display', Georgia, serif">Elegant italic</option>
+            <option value="400 {s}px Pacifico, cursive">Handwritten (Pacifico)</option>
+            <option value="400 {s}px 'Bebas Neue', Impact, sans-serif">Tall & bold (Bebas)</option>
+          </select>
+          <div class="row"><span class="label" style="flex:none">Text size</span><input type="range" id="tsize" min="20" max="260" value="110" aria-label="Text size"><span class="val" id="tsizeVal">110</span></div>
+          <span class="label">Click on the artboard where the text should go.</span>
+        </div>
+      </div>
+      <div class="sec">
+        <h3>Background</h3>
+        <div class="seg" id="bgSeg"><button data-bg="transparent" aria-pressed="true">None</button><button data-bg="#ffffff" aria-pressed="false">White</button><button data-bg="color" aria-pressed="false">Colour</button></div>
+        <div class="current" id="bgPick" hidden><input type="color" id="bgColor" value="#0d0f2a" aria-label="Background colour"><span class="label">Background colour</span></div>
+        <label class="check"><input type="checkbox" id="guides"> Show centre guides</label>
+      </div>
+      <div class="sec">
+        <div class="acts">
+          <button class="btn" id="clearBtn">Clear all</button>
+          <button class="btn" id="dlBtn2">Download PNG</button>
+        </div>
+        <span class="label">Your drawing is saved in this browser while you work.</span>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal-bg" id="sendModal" hidden>
+  <form class="modal" id="sendForm" novalidate role="dialog" aria-modal="true" aria-labelledby="sendTitle">
+    <h2 id="sendTitle">Send your logo idea</h2>
+    <img id="sendPreview" alt="Your logo sketch">
+    <p>We'll turn your sketch into a polished, professional logo and send you a free quote.</p>
+    <label class="label" for="sName">Your name</label><input class="inp" id="sName" autocomplete="name" placeholder="e.g. Sara Ahmed">
+    <label class="label" for="sBiz">Business name</label><input class="inp" id="sBiz" autocomplete="organization" placeholder="e.g. Sunrise Bakery">
+    <label class="label" for="sReach">Phone or email</label><input class="inp" id="sReach" placeholder="e.g. 613 555 0123">
+    <label class="label" for="sNote">Anything else? (optional)</label><input class="inp" id="sNote" placeholder="Colours you like, ideas, deadline…">
+    <p id="sendMsg" role="status" style="min-height:1.2em"></p>
+    <div class="acts">
+      <button type="submit" class="btn primary" id="sendGo">Send my logo</button>
+      <a class="btn wa" id="sendWa" href="https://wa.me/pixelandbrush1" target="_blank" rel="noopener" hidden>Send a message on WhatsApp</a>
+      <button type="button" class="btn" id="sendClose">Close</button>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+const EMAIL = "sm@pixelandbrush.com", CC = "marufi.saad@gmail.com", WA_ID = "pixelandbrush1";
+const FORM_URL = "https://formsubmit.co/ajax/" + EMAIL;
+const STORE = "pb-logo-maker-v1";
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const art = $("#art"), live = $("#live"), guide = $("#guide"), board = $("#board");
+const ctx = art.getContext("2d"), lctx = live.getContext("2d");
+const W = art.width, H = art.height;
+
+const S = { tool:"brush", color:"#7b3fe4", alpha:1, size:14, fill:"filled", bg:"transparent", bgColor:"#0d0f2a", undo:[], redo:[], recent:[] };
+const PALETTE = ["#000000","#ffffff","#2f6bff","#7b3fe4","#e0338f","#ff3b30","#ff9500","#ffcc00","#34c759","#00c2a8","#0ea5e9","#1e3a8a","#8d5b3c","#9a9a9a","#f5e6d3","clear"];
+
+function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2200); }
+
+/* ---------- colours ---------- */
+function rgba(){ const n=parseInt(S.color.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${S.alpha})`; }
+function setColor(c, remember){
+  if(!/^#[0-9a-f]{6}$/i.test(c)) return;
+  S.color = c.toLowerCase(); $("#color").value = S.color; $("#hex").value = S.color.toUpperCase();
+  if(remember){ S.recent = [S.color, ...S.recent.filter(x=>x!==S.color)].slice(0,8); renderRecent(); }
+  $$("#swatches .sw").forEach(b => b.setAttribute("aria-pressed", b.dataset.c === S.color));
+}
+function swatch(c){ const b=document.createElement("button"); b.className="sw"+(c==="clear"?" clear":""); b.type="button";
+  if(c==="clear"){ b.title="Eraser"; b.setAttribute("aria-label","Eraser"); b.onclick=()=>setTool("eraser"); }
+  else { b.style.background=c; b.dataset.c=c; b.title=c.toUpperCase(); b.setAttribute("aria-label","Colour "+c); b.onclick=()=>{ setColor(c,true); if(S.tool==="eraser") setTool("brush"); }; }
+  return b; }
+PALETTE.forEach(c => $("#swatches").append(swatch(c)));
+function renderRecent(){ const r=$("#recent"); r.textContent=""; (S.recent.length?S.recent:["#7b3fe4"]).forEach(c=>r.append(swatch(c))); }
+$("#color").addEventListener("input", e => setColor(e.target.value, false));
+$("#color").addEventListener("change", e => setColor(e.target.value, true));
+$("#hex").addEventListener("change", e => { let v=e.target.value.trim(); if(!v.startsWith("#")) v="#"+v; if(/^#[0-9a-f]{3}$/i.test(v)) v="#"+[...v.slice(1)].map(x=>x+x).join(""); if(/^#[0-9a-f]{6}$/i.test(v)) setColor(v,true); else { e.target.value=S.color.toUpperCase(); toast("Use a colour code like #7B3FE4"); } });
+$("#alpha").addEventListener("input", e => { S.alpha = e.target.value/100; $("#alphaVal").textContent = e.target.value+"%"; });
+$("#size").addEventListener("input", e => { S.size = +e.target.value; $("#sizeVal").textContent = S.size+" px"; });
+$("#tsize").addEventListener("input", e => $("#tsizeVal").textContent = e.target.value);
+$$("#fillSeg button").forEach(b => b.onclick = () => { S.fill=b.dataset.fill; $$("#fillSeg button").forEach(x=>x.setAttribute("aria-pressed", x===b)); });
+
+/* ---------- tools ---------- */
+function setTool(t){
+  S.tool = t; $$(".tool").forEach(b => b.setAttribute("aria-pressed", b.dataset.tool===t));
+  $("#textOpts").hidden = t!=="text";
+  $("#shapeOpts").hidden = !["circle","triangle","square"].includes(t);
+  live.style.cursor = t==="text" ? "text" : t==="fill" ? "cell" : "crosshair";
+}
+$$(".tool").forEach(b => b.onclick = () => setTool(b.dataset.tool));
+setTool("brush");
+
+/* ---------- history ---------- */
+function snapshot(){ return ctx.getImageData(0,0,W,H); }
+function pushUndo(){ S.undo.push(snapshot()); if(S.undo.length>25) S.undo.shift(); S.redo=[]; updateUndo(); }
+function updateUndo(){ $("#undoBtn").disabled=!S.undo.length; $("#redoBtn").disabled=!S.redo.length; }
+function undo(){ if(!S.undo.length) return; S.redo.push(snapshot()); ctx.putImageData(S.undo.pop(),0,0); updateUndo(); changed(); }
+function redo(){ if(!S.redo.length) return; S.undo.push(snapshot()); ctx.putImageData(S.redo.pop(),0,0); updateUndo(); changed(); }
+$("#undoBtn").onclick=undo; $("#redoBtn").onclick=redo;
+function changed(){ $("#hint").hidden = true; clearTimeout(changed.t); changed.t = setTimeout(save, 500); }
+
+/* ---------- drawing ---------- */
+function pos(e){ const r=live.getBoundingClientRect(); return { x:(e.clientX-r.left)*W/r.width, y:(e.clientY-r.top)*H/r.height }; }
+function style(c){ c.lineCap="round"; c.lineJoin="round"; c.lineWidth=S.size; c.strokeStyle=rgba(); c.fillStyle=rgba(); }
+function shapePath(c, a, b, shift){
+  let x=Math.min(a.x,b.x), y=Math.min(a.y,b.y), w=Math.abs(b.x-a.x), h=Math.abs(b.y-a.y);
+  if(shift && S.tool!=="triangle"){ const m=Math.max(w,h); w=h=m; x = b.x<a.x ? a.x-m : a.x; y = b.y<a.y ? a.y-m : a.y; }
+  c.beginPath();
+  if(S.tool==="circle") c.ellipse(x+w/2, y+h/2, Math.max(w/2,.5), Math.max(h/2,.5), 0, 0, Math.PI*2);
+  else if(S.tool==="square") c.rect(x,y,w,h);
+  else { c.moveTo(x+w/2,y); c.lineTo(x+w,y+h); c.lineTo(x,y+h); c.closePath(); }
+}
+function drawShape(c, a, b, shift){ style(c); shapePath(c,a,b,shift); if(S.fill==="filled") c.fill(); else c.stroke(); }
+function snapLine(a, b, shift){ if(!shift) return b; const dx=b.x-a.x, dy=b.y-a.y, ang=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4), len=Math.hypot(dx,dy); return {x:a.x+Math.cos(ang)*len, y:a.y+Math.sin(ang)*len}; }
+
+let down=null, last=null, pts=[];
+live.addEventListener("pointerdown", e => {
+  if(e.button!==0) return; e.preventDefault(); live.setPointerCapture(e.pointerId);
+  const p = pos(e);
+  if(S.tool==="text"){ placeText(p); return; }
+  if(S.tool==="fill"){ pushUndo(); floodFill(Math.floor(p.x), Math.floor(p.y)); changed(); return; }
+  pushUndo(); down=p; last=p; pts=[p];
+  if(S.tool==="brush"||S.tool==="eraser"){ stroke(p,p); }
+});
+live.addEventListener("pointermove", e => {
+  const p = pos(e);
+  if(!down){ drawCursor(p); return; }
+  if(S.tool==="brush"||S.tool==="eraser"){ stroke(last,p); last=p; }
+  else { lctx.clearRect(0,0,W,H);
+    if(S.tool==="line"){ style(lctx); const q=snapLine(down,p,e.shiftKey); lctx.beginPath(); lctx.moveTo(down.x,down.y); lctx.lineTo(q.x,q.y); lctx.stroke(); }
+    else drawShape(lctx, down, p, e.shiftKey); }
+});
+function finish(e){
+  if(!down) return; const p = pos(e);
+  lctx.clearRect(0,0,W,H);
+  if(S.tool==="line"){ style(ctx); const q=snapLine(down,p,e.shiftKey); ctx.beginPath(); ctx.moveTo(down.x,down.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
+  else if(["circle","triangle","square"].includes(S.tool)){ if(Math.hypot(p.x-down.x,p.y-down.y)>3) drawShape(ctx, down, p, e.shiftKey); else S.undo.pop(); }
+  ctx.globalCompositeOperation="source-over";
+  down=null; updateUndo(); changed();
+}
+live.addEventListener("pointerup", finish);
+live.addEventListener("pointercancel", finish);
+live.addEventListener("pointerleave", () => { if(!down) lctx.clearRect(0,0,W,H); });
+function stroke(a,b){
+  style(ctx);
+  ctx.globalCompositeOperation = S.tool==="eraser" ? "destination-out" : "source-over";
+  if(S.tool==="eraser") ctx.strokeStyle="#000";
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+}
+function drawCursor(p){ // a ring showing brush / eraser size
+  lctx.clearRect(0,0,W,H);
+  if(!["brush","eraser","line"].includes(S.tool)) return;
+  lctx.beginPath(); lctx.arc(p.x,p.y,Math.max(S.size/2,2),0,Math.PI*2);
+  lctx.lineWidth=2; lctx.strokeStyle= S.tool==="eraser" ? "#ff5c7a" : "rgba(40,40,60,.6)"; lctx.stroke();
+}
+async function placeText(p){
+  const txt = $("#textVal").value.trim(); if(!txt){ toast("Type your text in the panel first"); $("#textVal").focus(); return; }
+  const font = $("#font").value.replace("{s}", $("#tsize").value);
+  try{ await document.fonts.load(font, txt); }catch(e){}
+  pushUndo(); style(ctx);
+  ctx.font = font;
+  ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(txt, p.x, p.y);
+  updateUndo(); changed();
+}
+function floodFill(x0,y0){
+  const img = ctx.getImageData(0,0,W,H), d = img.data, i0 = (y0*W+x0)*4;
+  const t = [d[i0],d[i0+1],d[i0+2],d[i0+3]];
+  const n = parseInt(S.color.slice(1),16), f = [n>>16,(n>>8)&255,n&255,Math.round(S.alpha*255)];
+  if(t.every((v,k)=>Math.abs(v-f[k])<2)) return;
+  const near = i => Math.abs(d[i]-t[0])+Math.abs(d[i+1]-t[1])+Math.abs(d[i+2]-t[2])+Math.abs(d[i+3]-t[3]) < 96;
+  const seen = new Uint8Array(W*H), stack=[x0,y0];
+  while(stack.length){
+    const y=stack.pop(), x=stack.pop(); let xl=x;
+    while(xl>=0 && !seen[y*W+xl] && near((y*W+xl)*4)) xl--;
+    xl++; let up=false, dn=false;
+    for(let xi=xl; xi<W && !seen[y*W+xi] && near((y*W+xi)*4); xi++){
+      const k=(y*W+xi)*4; d[k]=f[0]; d[k+1]=f[1]; d[k+2]=f[2]; d[k+3]=f[3]; seen[y*W+xi]=1;
+      if(y>0){ const u=!seen[(y-1)*W+xi] && near(((y-1)*W+xi)*4); if(u&&!up){ stack.push(xi,y-1); } up=u; }
+      if(y<H-1){ const v=!seen[(y+1)*W+xi] && near(((y+1)*W+xi)*4); if(v&&!dn){ stack.push(xi,y+1); } dn=v; }
+    }
+  }
+  ctx.putImageData(img,0,0);
+}
+
+/* ---------- background & guides ---------- */
+function setBg(v){
+  S.bg=v; $$("#bgSeg button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.bg===v));
+  $("#bgPick").hidden = v!=="color";
+  board.classList.toggle("transparent", v==="transparent");
+  board.style.backgroundColor = v==="transparent" ? "#fff" : v==="color" ? S.bgColor : v;
+  save();
+}
+$$("#bgSeg button").forEach(b => b.onclick = () => setBg(b.dataset.bg));
+$("#bgColor").addEventListener("input", e => { S.bgColor=e.target.value; if(S.bg==="color") board.style.backgroundColor=S.bgColor; save(); });
+(() => { const g=guide.getContext("2d"); g.strokeStyle="rgba(123,63,228,.45)"; g.lineWidth=2; g.setLineDash([10,10]);
+  g.beginPath(); g.moveTo(W/2,0); g.lineTo(W/2,H); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
+  g.beginPath(); g.arc(W/2,H/2,W*.35,0,Math.PI*2); g.stroke(); })();
+$("#guides").addEventListener("change", e => board.classList.toggle("guides", e.target.checked));
+
+/* ---------- clear / export ---------- */
+let clearArmed=false;
+$("#clearBtn").onclick = () => {
+  if(!clearArmed){ clearArmed=true; $("#clearBtn").textContent="Tap again to clear"; setTimeout(()=>{ clearArmed=false; $("#clearBtn").textContent="Clear all"; },2500); return; }
+  clearArmed=false; $("#clearBtn").textContent="Clear all";
+  pushUndo(); ctx.clearRect(0,0,W,H); changed(); toast("Cleared — Undo brings it back");
+};
+function exportCanvas(){
+  const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  if(S.bg!=="transparent"){ x.fillStyle = S.bg==="color" ? S.bgColor : S.bg; x.fillRect(0,0,W,H); }
+  x.drawImage(art,0,0); return c;
+}
+function isEmpty(){ const d=ctx.getImageData(0,0,W,H).data; for(let i=3;i<d.length;i+=16) if(d[i]) return false; return true; }
+function download(){
+  if(isEmpty()){ toast("Draw something first"); return; }
+  exportCanvas().toBlob(b => { const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download="my-logo.png"; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); toast("Downloading my-logo.png"); }, "image/png");
+}
+$("#dlBtn").onclick=download; $("#dlBtn2").onclick=download;
+
+/* ---------- send to Pixel & Brush ---------- */
+$("#sendBtn").onclick = () => {
+  if(isEmpty()){ toast("Draw your logo idea first"); return; }
+  $("#sendPreview").src = exportCanvas().toDataURL("image/png");
+  $("#sendMsg").textContent=""; $("#sendWa").hidden=true; $("#sendGo").hidden=false;
+  $("#sendModal").hidden=false; $("#sName").focus();
+};
+$("#sendClose").onclick = () => $("#sendModal").hidden=true;
+$("#sendModal").addEventListener("click", e => { if(e.target.id==="sendModal") $("#sendModal").hidden=true; });
+async function post(fd, ms){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms);
+  try{ const r=await fetch(FORM_URL,{method:"POST",body:fd,headers:{Accept:"application/json"},signal:c.signal}); const j=await r.json().catch(()=>({})); return r.ok && String(j.success)==="true"; }
+  catch(e){ return false; } finally{ clearTimeout(t); } }
+$("#sendForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name=$("#sName").value.trim(), biz=$("#sBiz").value.trim(), reach=$("#sReach").value.trim(), note=$("#sNote").value.trim();
+  if(!name){ $("#sendMsg").textContent="Please add your name."; $("#sName").focus(); return; }
+  if(!reach){ $("#sendMsg").textContent="Please add a phone number or email so we can reply."; $("#sReach").focus(); return; }
+  const go=$("#sendGo"); go.disabled=true; go.textContent="Sending…";
+  const blob = await new Promise(r => exportCanvas().toBlob(r,"image/png"));
+  const make = withImg => { const fd=new FormData();
+    fd.append("_subject",`New logo sketch: ${biz||name}`); fd.append("_cc",CC); fd.append("_captcha","false"); fd.append("_template","table");
+    if(/@/.test(reach)) fd.append("_replyto",reach);
+    fd.append("Customer name",name); fd.append("Business",biz||"—"); fd.append("Phone or email",reach); fd.append("Notes",note||"—");
+    if(withImg) fd.append("attachment",blob,"logo-sketch.png"); return fd; };
+  let ok = await post(make(true), 15000);
+  if(!ok) ok = await post(make(false), 20000);
+  go.disabled=false; go.textContent="Send my logo";
+  const wa = `Hi Pixel and Brush! I'm ${name}${biz?" from "+biz:""}. I sketched a logo idea on your website${ok?" and sent it to you by email":""}.${note?"\n\n"+note:""}\n\nReach me at: ${reach}`;
+  $("#sendWa").href = `https://wa.me/${WA_ID}?text=${encodeURIComponent(wa)}`; $("#sendWa").hidden=false;
+  if(ok){ go.hidden=true; $("#sendMsg").textContent="Sent! We'll get back to you soon. You can also message us on WhatsApp."; }
+  else $("#sendMsg").textContent="We couldn't send it automatically. Download your PNG and send it to us on WhatsApp, or email "+EMAIL+".";
+});
+
+/* ---------- keyboard ---------- */
+document.addEventListener("keydown", e => {
+  if(e.target.closest("input,select,textarea")) return;
+  const k=e.key.toLowerCase(), mod=e.ctrlKey||e.metaKey;
+  if(mod && k==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
+  if(mod && k==="y"){ e.preventDefault(); redo(); return; }
+  if(e.key==="Escape") $("#sendModal").hidden=true;
+  const map={b:"brush",l:"line",e:"eraser",c:"circle",t:"triangle",s:"square",x:"text",f:"fill"};
+  if(!mod && map[k]) setTool(map[k]);
+  if(k==="[" ) { $("#size").value=Math.max(1,S.size-4); $("#size").dispatchEvent(new Event("input")); }
+  if(k==="]" ) { $("#size").value=Math.min(120,S.size+4); $("#size").dispatchEvent(new Event("input")); }
+});
+
+/* ---------- save in this browser ---------- */
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify({img: isEmpty()?null:art.toDataURL("image/png"), bg:S.bg, bgColor:S.bgColor, color:S.color, recent:S.recent})); }catch(e){} }
+function restore(){
+  try{ const o=JSON.parse(localStorage.getItem(STORE)||"null"); if(!o) return;
+    if(o.recent) S.recent=o.recent; if(o.color) setColor(o.color,false);
+    if(o.bgColor){ S.bgColor=o.bgColor; $("#bgColor").value=o.bgColor; } if(o.bg) setBg(o.bg);
+    if(o.img){ const im=new Image(); im.onload=()=>{ ctx.drawImage(im,0,0); $("#hint").hidden=true; }; im.src=o.img; }
+  }catch(e){}
+}
+renderRecent(); setColor(S.color,false); restore();
+})();
+</script>
+</body>
+</html>
