@@ -76,5 +76,5 @@ if (form) form.addEventListener("submit", e => {
   const msg = ($("#msg") || {}).value?.trim() || "";
   const text = `Hi Pixel and Brush! I'm ${name}${biz ? " from " + biz : ""}.\nInterested in: ${svcs.join(", ") || "not sure yet"}.${msg ? "\n\n" + msg : ""}`;
   const a = document.createElement("a"); a.href = waURL(text); a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
-  note.textContent = `WhatsApp should open with your message ready. If it doesn't, WhatsApp us at ${HANDLE} or call ${PHONE_DISPLAY}.`;
+  note.textContent = `WhatsApp should open with your message ready. If it doesn't, WhatsApp us at ${HANDLE} or call ${PHONE_DISPLAY}, or email sm@pixelandbrush.com.`;
 });

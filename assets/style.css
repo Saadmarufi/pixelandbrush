@@ -330,3 +330,7 @@ footer{padding-block:40px 56px;border-top:1px solid var(--line);margin-top:40px}
 .ig-band small{color:var(--muted);font-family:var(--f-mono)}
 .ig-ic{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(45deg,#f9ce34,#ee2a7b 50%,#6228d7);color:#fff;flex:none}
 .ig-ic svg{width:28px;height:28px}
+.way.mail-way{background:rgba(47,107,255,.1);border-color:rgba(47,107,255,.35)}
+.way.mail-way .ic{background:var(--blue);color:#fff}
+.way .who{flex:1 1 150px}
+.way .who strong{overflow-wrap:anywhere;font-size:clamp(.88rem,3.6vw,1.05rem)}
